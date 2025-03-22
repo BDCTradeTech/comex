@@ -251,12 +251,12 @@
             background-color: #f8f9fa;
         }
         .crud-action-btn {
-            padding: 4px 8px;
-            font-size: 12px;
+            padding: 5px 10px;
+            font-size: 13px;
             border-radius: 3px;
             margin-right: 5px;
             cursor: pointer;
-            width: 70px;
+            width: 80px;
             text-align: center;
         }
         .crud-edit-btn {
@@ -273,10 +273,10 @@
             background-color: #27ae60;
             color: white;
             border: none;
-            padding: 4px 8px;
-            font-size: 12px;
+            padding: 5px 10px;
+            font-size: 13px;
             border-radius: 3px;
-            width: 70px;
+            width: 80px;
             text-align: center;
             display: inline-block;
         }
@@ -329,20 +329,20 @@
         }
         .config-field label {
             display: block;
-            margin-bottom: 3px;
-            font-size: 12px;
+            margin-bottom: 4px;
+            font-size: 13px;
             font-weight: 500;
-            color: #555;
+            color: #333;
             white-space: nowrap;
             text-overflow: ellipsis;
             overflow: hidden;
         }
         .config-field input {
             width: 90%;
-            padding: 4px 6px;
-            border: 1px solid #ddd;
+            padding: 6px 8px;
+            border: 1px solid #ccc;
             border-radius: 4px;
-            font-size: 12px;
+            font-size: 13px;
         }
         .crud-form {
             background-color: #f8f9fa;
@@ -2873,12 +2873,12 @@
                     const rect = contentArea.getBoundingClientRect();
                     
                     // Ajustamos para capturar menos contenido en la parte superior e inferior
-                    const topOffset = 50; // 50px desde la parte superior visible
+                    const topOffset = 100; // 100px desde la parte superior visible (antes era 50px)
                     const visibleTop = Math.max(0, rect.top) + topOffset;
                     const visibleHeight = Math.min(window.innerHeight - visibleTop, rect.height - Math.max(0, -rect.top) - topOffset);
                     
-                    // Capturamos un 60% del contenido visible
-                    const captureHeight = Math.min(visibleHeight * 0.8, rect.height * 0.6);
+                    // Capturamos un 50% del contenido visible (antes era 60%)
+                    const captureHeight = Math.min(visibleHeight * 0.7, rect.height * 0.5);
                     
                     // Capturamos el contenido visible
                     html2canvas(contentArea, {
