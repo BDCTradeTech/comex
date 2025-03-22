@@ -96,8 +96,8 @@
             flex: 1;
         }
         .sidebar-footer {
-            text-align: center;
-            padding: 15px 0;
+            text-align: left;
+            padding: 15px 20px;
             border-top: 1px solid #34495e;
             font-size: 12px;
             color: #95a5a6;
@@ -251,12 +251,12 @@
             background-color: #f8f9fa;
         }
         .crud-action-btn {
-            padding: 3px 6px;
-            font-size: 11px;
+            padding: 4px 8px;
+            font-size: 12px;
             border-radius: 3px;
             margin-right: 5px;
             cursor: pointer;
-            width: 60px;
+            width: 70px;
             text-align: center;
         }
         .crud-edit-btn {
@@ -273,10 +273,10 @@
             background-color: #27ae60;
             color: white;
             border: none;
-            padding: 3px 6px;
-            font-size: 11px;
+            padding: 4px 8px;
+            font-size: 12px;
             border-radius: 3px;
-            width: 60px;
+            width: 70px;
             text-align: center;
             display: inline-block;
         }
@@ -2871,18 +2871,21 @@
                     const scrollTop = window.scrollY || document.documentElement.scrollTop;
                     const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
                     const rect = contentArea.getBoundingClientRect();
-                    const visibleTop = Math.max(0, rect.top);
-                    const visibleHeight = Math.min(window.innerHeight - visibleTop, rect.height - Math.max(0, -rect.top));
                     
-                    // Si no hay altura visible o es muy pequeña, capturamos menos contenido
-                    const captureHeight = Math.min(visibleHeight * 1.2, rect.height * 0.8);
+                    // Ajustamos para capturar menos contenido en la parte superior e inferior
+                    const topOffset = 50; // 50px desde la parte superior visible
+                    const visibleTop = Math.max(0, rect.top) + topOffset;
+                    const visibleHeight = Math.min(window.innerHeight - visibleTop, rect.height - Math.max(0, -rect.top) - topOffset);
+                    
+                    // Capturamos un 60% del contenido visible
+                    const captureHeight = Math.min(visibleHeight * 0.8, rect.height * 0.6);
                     
                     // Capturamos el contenido visible
                     html2canvas(contentArea, {
                         scale: 1.5,
                         backgroundColor: '#ffffff',
                         logging: false,
-                        y: rect.top + scrollTop,
+                        y: rect.top + scrollTop + topOffset,
                         x: rect.left + scrollLeft,
                         width: rect.width,
                         height: captureHeight
