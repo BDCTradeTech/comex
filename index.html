@@ -2877,8 +2877,8 @@
                     const visibleTop = Math.max(0, rect.top) + topOffset;
                     const visibleHeight = Math.min(window.innerHeight - visibleTop, rect.height - Math.max(0, -rect.top) - topOffset);
                     
-                    // Capturamos un 50% del contenido visible (antes era 60%)
-                    const captureHeight = Math.min(visibleHeight * 0.7, rect.height * 0.5);
+                    // Aumentamos la captura para mostrar más contenido en la parte inferior
+                    const captureHeight = Math.min(visibleHeight * 0.9, rect.height * 0.7);
                     
                     // Capturamos el contenido visible
                     html2canvas(contentArea, {
