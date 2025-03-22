@@ -1200,8 +1200,9 @@
                                 <button class="crud-add-btn" onclick="showAddForm()">Nueva Posición</button>
                             </div>
                             
-                            <div class="add-form">
-                                <h3>Agregar Posición Arancelaria</h3>
+                            <div id="crud-form" class="add-form" style="display: none;">
+                                <h3 id="form-title">Agregar Posición Arancelaria</h3>
+                                <input type="hidden" id="posicion-id">
                                 <div class="form-row">
                                     <div class="form-col">
                                         <div class="form-group">
@@ -1383,9 +1384,9 @@
                     document.querySelector('.dolar-card:first-child .dolar-valor').textContent = `$${dolarOficial}`;
                     document.getElementById('dolar-oficial-form').style.display = 'none';
                     await guardarValoresDolar();
-                    alert('Valor del Dolar Oficial guardado correctamente.');
+                    mostrarMensaje('Valor del Dolar Oficial guardado correctamente');
                 } else {
-                    alert('Por favor, ingrese un valor válido para el Dolar Oficial.');
+                    mostrarMensaje('Por favor, ingrese un valor válido para el Dolar Oficial', 'error');
                 }
             } else if (tipo === 'blue') {
                 const nuevoValor = parseFloat(document.getElementById('valor-dolar-blue').value);
@@ -1394,9 +1395,9 @@
                     document.querySelector('.dolar-card:nth-child(2) .dolar-valor').textContent = `$${dolarBlue}`;
                     document.getElementById('dolar-blue-form').style.display = 'none';
                     await guardarValoresDolar();
-                    alert('Valor del Dolar Blue guardado correctamente.');
+                    mostrarMensaje('Valor del Dolar Blue guardado correctamente');
                 } else {
-                    alert('Por favor, ingrese un valor válido para el Dolar Blue.');
+                    mostrarMensaje('Por favor, ingrese un valor válido para el Dolar Blue', 'error');
                 }
             }
         }
@@ -2111,7 +2112,7 @@
             if (!posicion || isNaN(flete) || isNaN(seguro) || isNaN(derechos) || 
                 isNaN(estadistica) || isNaN(iva) || isNaN(ivaAdicional) || 
                 isNaN(ganancia) || isNaN(iibb)) {
-                alert('Por favor, complete todos los campos correctamente.');
+                mostrarMensaje('Por favor, complete todos los campos correctamente.', 'error');
                 return;
             }
             
@@ -2151,18 +2152,41 @@
                 });
             }
             
-            await guardarPosicionesArancelarias();
-            renderPosicionesTable();
-            cancelForm();
-            alert('Posición arancelaria guardada correctamente.');
+            // Guardar y actualizar la tabla
+            localStorage.setItem('posicionesArancelarias', JSON.stringify(posicionesArancelarias));
+            renderPosicionesTable('posicion', 'asc');
+            updateSortIndicators('posicion', 'asc');
+            document.getElementById('crud-form').style.display = 'none';
+            
+            // Actualizar opciones en el selector de posiciones arancelarias
+            const tariffSelect = document.getElementById('tariff-position');
+            if (tariffSelect) {
+                tariffSelect.innerHTML = '<option value="">Seleccionar posición arancelaria</option>';
+                posicionesArancelarias.forEach(item => {
+                    tariffSelect.innerHTML += `<option value="${item.id}">${item.posicion}</option>`;
+                });
+            }
+            
+            mostrarMensaje(id ? 'Posición arancelaria actualizada correctamente.' : 'Nueva posición arancelaria creada correctamente.');
         }
         
         async function deletePosition(id) {
             if (confirm('¿Está seguro de que desea eliminar esta posición arancelaria?')) {
                 posicionesArancelarias = posicionesArancelarias.filter(p => p.id !== id);
-                await guardarPosicionesArancelarias();
-                renderPosicionesTable();
-                alert('Posición arancelaria eliminada correctamente.');
+                localStorage.setItem('posicionesArancelarias', JSON.stringify(posicionesArancelarias));
+                renderPosicionesTable('posicion', 'asc');
+                updateSortIndicators('posicion', 'asc');
+                
+                // Actualizar opciones en el selector de posiciones arancelarias
+                const tariffSelect = document.getElementById('tariff-position');
+                if (tariffSelect) {
+                    tariffSelect.innerHTML = '<option value="">Seleccionar posición arancelaria</option>';
+                    posicionesArancelarias.forEach(item => {
+                        tariffSelect.innerHTML += `<option value="${item.id}">${item.posicion}</option>`;
+                    });
+                }
+                
+                mostrarMensaje('Posición arancelaria eliminada correctamente.');
             }
         }
 
@@ -2745,9 +2769,9 @@
                     document.querySelector('.dolar-card:first-child .dolar-valor').textContent = `$${dolarOficial}`;
                     document.getElementById('dolar-oficial-form').style.display = 'none';
                     await guardarValoresDolar();
-                    alert('Valor del Dolar Oficial guardado correctamente.');
+                    mostrarMensaje('Valor del Dolar Oficial guardado correctamente');
                 } else {
-                    alert('Por favor, ingrese un valor válido para el Dolar Oficial.');
+                    mostrarMensaje('Por favor, ingrese un valor válido para el Dolar Oficial', 'error');
                 }
             } else if (tipo === 'blue') {
                 const nuevoValor = parseFloat(document.getElementById('valor-dolar-blue').value);
@@ -2756,9 +2780,9 @@
                     document.querySelector('.dolar-card:nth-child(2) .dolar-valor').textContent = `$${dolarBlue}`;
                     document.getElementById('dolar-blue-form').style.display = 'none';
                     await guardarValoresDolar();
-                    alert('Valor del Dolar Blue guardado correctamente.');
+                    mostrarMensaje('Valor del Dolar Blue guardado correctamente');
                 } else {
-                    alert('Por favor, ingrese un valor válido para el Dolar Blue.');
+                    mostrarMensaje('Por favor, ingrese un valor válido para el Dolar Blue', 'error');
                 }
             }
         }
