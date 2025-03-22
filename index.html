@@ -224,9 +224,13 @@
         }
         .crud-header {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: center;
             margin-bottom: 20px;
+        }
+        .crud-header h3 {
+            margin: 0;
+            margin-right: 15px;
         }
         .crud-table {
             width: 100%;
@@ -1001,7 +1005,7 @@
                     contentArea.innerHTML = `
                         <h1 class="page-title">Datos Generales</h1>
                         
-                        <div class="config-row">
+                        <div class="config-row" style="justify-content: center; flex-wrap: wrap;">
                             <div class="config-section">
                                 <h3>Miami</h3>
                                 <div class="config-field">
@@ -1065,33 +1069,33 @@
                                     <input type="number" id="hongkong-gastos-origen" step="0.01" min="0" value="${datosGenerales.hongkong.gastosOrigen}">
                                 </div>
                             </div>
-                        </div>
-                        
-                        <div class="config-section">
-                            <h3>Varios</h3>
-                            <div class="config-field">
-                                <label for="varios-lcl">LCL (USD):</label>
-                                <input type="number" id="varios-lcl" step="0.01" min="0" value="${datosGenerales.varios.lcl}">
-                            </div>
-                            <div class="config-field">
-                                <label for="varios-resolucion">Resolución 3244 (USD):</label>
-                                <input type="number" id="varios-resolucion" step="0.01" min="0" value="${datosGenerales.varios.resolucion3244}">
-                            </div>
-                            <div class="config-field">
-                                <label for="varios-seguro">Seguro (USD):</label>
-                                <input type="number" id="varios-seguro" step="0.01" min="0" value="${datosGenerales.varios.seguro}">
-                            </div>
-                            <div class="config-field">
-                                <label for="varios-envio-domicilio">Envío a Domicilio (USD):</label>
-                                <input type="number" id="varios-envio-domicilio" step="0.01" min="0" value="${datosGenerales.varios.envioDomicilio}">
-                            </div>
-                            <div class="config-field">
-                                <label for="varios-ajuste-dolar">Ajuste Dolar ANA (%):</label>
-                                <input type="number" id="varios-ajuste-dolar" step="0.01" min="0" value="${datosGenerales.varios.ajusteDolarANA}">
-                            </div>
-                            <div class="config-field">
-                                <label for="varios-percepcion-iibb">Percepción IIBB (%):</label>
-                                <input type="number" id="varios-percepcion-iibb" step="0.01" min="0" value="${datosGenerales.varios.percepcionIIBB}">
+                            
+                            <div class="config-section">
+                                <h3>Varios</h3>
+                                <div class="config-field">
+                                    <label for="varios-lcl">LCL (USD):</label>
+                                    <input type="number" id="varios-lcl" step="0.01" min="0" value="${datosGenerales.varios.lcl}">
+                                </div>
+                                <div class="config-field">
+                                    <label for="varios-resolucion">Resolución 3244 (USD):</label>
+                                    <input type="number" id="varios-resolucion" step="0.01" min="0" value="${datosGenerales.varios.resolucion3244}">
+                                </div>
+                                <div class="config-field">
+                                    <label for="varios-seguro">Seguro (USD):</label>
+                                    <input type="number" id="varios-seguro" step="0.01" min="0" value="${datosGenerales.varios.seguro}">
+                                </div>
+                                <div class="config-field">
+                                    <label for="varios-envio-domicilio">Envío a Domicilio (USD):</label>
+                                    <input type="number" id="varios-envio-domicilio" step="0.01" min="0" value="${datosGenerales.varios.envioDomicilio}">
+                                </div>
+                                <div class="config-field">
+                                    <label for="varios-ajuste-dolar">Ajuste Dolar ANA (%):</label>
+                                    <input type="number" id="varios-ajuste-dolar" step="0.01" min="0" value="${datosGenerales.varios.ajusteDolarANA}">
+                                </div>
+                                <div class="config-field">
+                                    <label for="varios-percepcion-iibb">Percepción IIBB (%):</label>
+                                    <input type="number" id="varios-percepcion-iibb" step="0.01" min="0" value="${datosGenerales.varios.percepcionIIBB}">
+                                </div>
                             </div>
                         </div>
 
@@ -2863,19 +2867,25 @@
                     // Mostrar mensaje de espera
                     mostrarMensaje('Generando imagen, por favor espere...', 'info');
                     
+                    // Calculamos el área visible (solo lo que se ve en la ventana)
+                    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+                    const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
+                    const rect = contentArea.getBoundingClientRect();
+                    const visibleTop = Math.max(0, rect.top);
+                    const visibleHeight = Math.min(window.innerHeight - visibleTop, rect.height - Math.max(0, -rect.top));
+                    
+                    // Si no hay altura visible o es muy pequeña, capturamos menos contenido
+                    const captureHeight = Math.min(visibleHeight * 1.2, rect.height * 0.8);
+                    
                     // Capturamos el contenido visible
                     html2canvas(contentArea, {
-                        scale: 2,
+                        scale: 1.5,
                         backgroundColor: '#ffffff',
                         logging: false,
-                        windowWidth: document.documentElement.offsetWidth,
-                        windowHeight: document.documentElement.offsetHeight,
-                        scrollX: 0,
-                        scrollY: 0,
-                        x: contentArea.getBoundingClientRect().left,
-                        y: contentArea.getBoundingClientRect().top,
-                        width: contentArea.offsetWidth,
-                        height: contentArea.offsetHeight
+                        y: rect.top + scrollTop,
+                        x: rect.left + scrollLeft,
+                        width: rect.width,
+                        height: captureHeight
                     }).then(function(canvas) {
                         // Convertir a imagen y descargar
                         const image = canvas.toDataURL('image/jpeg', 0.9);
