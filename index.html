@@ -267,9 +267,12 @@
             background-color: #27ae60;
             color: white;
             border: none;
-            padding: 4px 8px;
+            padding: 3px 6px;
             font-size: 11px;
             border-radius: 3px;
+            width: auto;
+            max-width: 100px;
+            text-align: center;
         }
         .posicion-col {
             width: 180px;
@@ -319,17 +322,20 @@
         }
         .config-field label {
             display: block;
-            margin-bottom: 5px;
-            font-size: 13px;
+            margin-bottom: 3px;
+            font-size: 12px;
             font-weight: 500;
             color: #555;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
         }
         .config-field input {
-            width: 100%;
-            padding: 6px;
+            width: 90%;
+            padding: 4px 6px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            font-size: 13px;
+            font-size: 12px;
         }
         .crud-form {
             background-color: #f8f9fa;
@@ -2839,9 +2845,9 @@
             script.src = 'https://html2canvas.hertzen.com/dist/html2canvas.min.js';
             script.onload = function() {
                 // Una vez cargada la librería, capturar la imagen
-                const resultContainer = document.querySelector('.import-result');
+                const resultContainer = document.getElementById('result-container');
                 
-                if (resultContainer) {
+                if (resultContainer && resultContainer.innerHTML.trim() !== '') {
                     // Mostrar mensaje de espera
                     mostrarMensaje('Generando imagen, por favor espere...', 'info');
                     
@@ -2870,7 +2876,7 @@
                         mostrarMensaje('Error al generar la imagen', 'error');
                     });
                 } else {
-                    mostrarMensaje('No se encontró el contenido para descargar', 'error');
+                    mostrarMensaje('No hay resultados para descargar. Primero debe calcular una importación.', 'error');
                 }
             };
             script.onerror = function() {
