@@ -1,0 +1,2790 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Login - COMEX</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f0f2f5;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            position: relative;
+            top: 0;
+            margin-top: 0; /* Asegura que el contenedor esté centrado verticalmente */
+        }
+        .container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .container h2 {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            text-align: left;
+        }
+        input, select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #1a73e8;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #1557b0;
+        }
+        .error {
+            color: red;
+            margin-top: 1rem;
+        }
+        .success {
+            color: green;
+            margin-top: 1rem;
+        }
+        #loginSection {
+            display: block;
+        }
+        #appSection {
+            display: none;
+            height: 100vh;
+        }
+        
+        /* Estilos para la barra lateral */
+        .app-container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .sidebar h2 {
+            padding: 0 20px;
+            margin-bottom: 20px;
+        }
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar li {
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .sidebar li:hover {
+            background-color: #34495e;
+        }
+        .sidebar li.active {
+            background-color: #1a73e8;
+        }
+        .content-area {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #34495e;
+            padding-bottom: 15px;
+        }
+        .logout-btn {
+            padding: 5px 10px;
+            font-size: 14px;
+            width: auto;
+        }
+        .import-form {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .import-form h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .form-col {
+            flex: 1;
+        }
+        .calculate-btn {
+            margin-top: 20px;
+            background-color: #27ae60;
+        }
+        .calculate-btn:hover {
+            background-color: #219653;
+        }
+        .result-section {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #1a73e8;
+        }
+        .divider {
+            border-top: 1px solid #ddd;
+            margin: 15px 0;
+        }
+        .calculated-field {
+            background-color: #f0f2f5;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            text-align: right;
+            font-weight: bold;
+        }
+        .dolar-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+        }
+        .dolar-tipo {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .dolar-valor {
+            font-size: 24px;
+            color: #1a73e8;
+            font-weight: bold;
+        }
+        .page-title {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        .crud-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .crud-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .crud-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .crud-table th, .crud-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .crud-table th {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+        .crud-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        .crud-action-btn {
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin-right: 5px;
+            cursor: pointer;
+        }
+        .crud-edit-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+        }
+        .crud-delete-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+        }
+        .crud-add-btn {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+        }
+        .posicion-col {
+            width: 180px;
+        }
+        .edit-dolar-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        .save-dolar-btn {
+            background-color: #27ae60;
+            margin-top: 10px;
+        }
+        .dolar-edit-form {
+            margin-top: 10px;
+            display: none;
+        }
+        .github-info {
+            background-color: #f8f9fa;
+            border-left: 4px solid #1a73e8;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .config-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .config-section h3 {
+            color: #2c3e50;
+            margin-top: 0;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .config-field {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .config-field label {
+            flex: 1;
+            margin-bottom: 0;
+            min-width: 200px;
+        }
+        .config-field input {
+            flex: 1;
+            max-width: 150px;
+        }
+        .crud-form {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .pesos-crud-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .pesos-crud-container .crud-action-btn {
+            padding: 3px 8px;
+            font-size: 12px;
+            margin-right: 3px;
+        }
+        .result-table {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eaeaea;
+        }
+        .result-label {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .result-value {
+            text-align: right;
+            min-width: 120px;
+        }
+        .result-total {
+            font-size: 1.2em;
+            font-weight: bold;
+            border-bottom: 2px solid #2c3e50;
+            margin-top: 10px;
+            padding-top: 10px;
+        }
+        .result-divider {
+            height: 2px;
+            background-color: #2c3e50;
+            margin: 20px 0;
+        }
+        .result-cif {
+            font-weight: bold;
+            color: #1a73e8;
+            border-bottom: 1px solid #2c3e50;
+            margin-bottom: 10px;
+        }
+        /* Estilos para la pantalla de resultados más compacta */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .import-form, .import-form * {
+                visibility: visible;
+            }
+            .import-form {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            .no-print {
+                display: none !important;
+            }
+            @page {
+                size: A4;
+                margin: 10mm 15mm !important; /* Añadir márgenes a la página */
+            }
+            .compact-result {
+                font-size: 0.65em;
+                line-height: 1.2;
+                padding: 10mm !important;
+            }
+            .compact-result .result-row {
+                padding: 3px 0 !important;
+                margin: 0;
+                border-bottom: none;
+            }
+            .compact-result h3 {
+                margin: 0 0 5mm 0 !important;
+                padding: 0;
+                font-size: 1em;
+                text-align: center;
+            }
+            .github-info {
+                padding: 5px !important;
+                margin: 5mm 0 !important;
+                border-left: 2px solid #1a73e8 !important;
+                background-color: #f8f9fa !important;
+                font-size: 0.8em !important;
+            }
+            .result-divider {
+                margin: 5mm 0 !important;
+            }
+            .print-footer {
+                position: fixed;
+                bottom: 5mm;
+                width: 100%;
+                text-align: center;
+                font-style: italic;
+                font-size: 0.6em;
+                padding-top: 2mm !important;
+                color: #666;
+                left: 0;
+                border-top: 1px solid #ddd !important;
+                margin-top: 5mm !important;
+            }
+            .import-form {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            .result-value, .result-label {
+                font-size: 0.95em;
+                padding: 2px 5px !important;
+            }
+            .result-value {
+                min-width: 120px !important;
+            }
+            .page-title {
+                margin: 0 0 5mm 0 !important;
+                padding: 0 !important;
+                font-size: 1.2em !important;
+                text-align: center;
+            }
+            .result-table {
+                margin-bottom: 5mm !important;
+                width: 100% !important;
+            }
+            div[style*="display: flex"] {
+                margin: 2mm 0 !important;
+                padding: 0 !important;
+                gap: 5mm !important;
+            }
+            div[style*="flex: 1"] {
+                padding: 0 2mm !important;
+            }
+            .result-cif, .result-total {
+                font-weight: bold;
+                border-bottom: 1px solid #333 !important;
+                margin-bottom: 3mm !important;
+                padding-bottom: 1mm !important;
+            }
+            h1, h2, h3 {
+                margin: 0 0 3mm 0 !important;
+                padding: 0 !important;
+            }
+        }
+
+        .compact-result .result-row {
+            padding: 4px 0;
+        }
+
+        .compact-result .result-table {
+            font-size: 0.9em;
+        }
+
+        .compact-result .github-info {
+            padding: 8px;
+            margin: 10px 0;
+        }
+
+        .compact-result h3 {
+            margin-bottom: 10px;
+        }
+
+        .compact-result .result-divider {
+            margin: 10px 0;
+        }
+
+        .compact-result .result-value,
+        .compact-result .result-label {
+            line-height: 1.2;
+        }
+
+        .buttons-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px auto;
+        }
+
+        .print-btn {
+            background-color: #3498db;
+        }
+        
+        /* Estilos para mensajes de notificación */
+        .mensaje {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 4px;
+            background-color: #2ecc71;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 9999;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        
+        .mensaje-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .mensaje-error {
+            background-color: #e74c3c;
+        }
+        
+        .mensaje-warning {
+            background-color: #f39c12;
+        }
+        
+        .mensaje-info {
+            background-color: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div id="loginSection" class="login-container">
+        <div class="container">
+            <h2>Iniciar Sesion Comex BDC</h2>
+            <div class="form-group">
+                <label for="email">Email/Usuario:</label>
+                <input type="text" id="email" value="prueba">
+            </div>
+            <div class="form-group">
+                <label for="password">Contraseña:</label>
+                <input type="password" id="password" value="123">
+            </div>
+            <button onclick="login()">Iniciar Sesión</button>
+            <p id="loginError" class="error"></p>
+        </div>
+    </div>
+
+    <div id="appSection">
+        <div class="app-container">
+            <div class="sidebar">
+                <div class="user-info">
+                    <p id="welcomeMessage"></p>
+                    <button class="logout-btn" onclick="logout()">Salir</button>
+                </div>
+                <ul>
+                    <li onclick="activateMenuItem(this, 'importacion')" class="active">Importación</li>
+                    <li onclick="activateMenuItem(this, 'dolar')">Dolar</li>
+                    <li onclick="activateMenuItem(this, 'datos_generales')">Datos generales</li>
+                    <li onclick="activateMenuItem(this, 'arancelarias')">Posiciones Arancelarias</li>
+                    <li onclick="activateMenuItem(this, 'pesos')">Pesos</li>
+                </ul>
+            </div>
+            <div class="content-area" id="contentArea">
+                <!-- Aquí se cargará el contenido dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const validUsers = [
+            { email: 'diegolas@gmail.com', password: '123' },
+            { email: 'prueba', password: '123' }
+        ];
+        
+        // Variables para almacenar datos
+        let posicionesArancelarias = [
+            {
+                id: 1,
+                posicion: '10,5% + 0D + 0E',
+                flete: 3,
+                seguro: 2,
+                derechos: 0,
+                estadistica: 0,
+                iva: 10.5,
+                ivaAdicional: 0,
+                ganancia: 0,
+                iibb: 0
+            },
+            {
+                id: 2,
+                posicion: '10,5% + 10,8D + 0E',
+                flete: 3,
+                seguro: 2,
+                derechos: 10.8,
+                estadistica: 0,
+                iva: 10.5,
+                ivaAdicional: 0,
+                ganancia: 0,
+                iibb: 0
+            },
+            {
+                id: 3,
+                posicion: '10,5% + 16D + 0E',
+                flete: 3,
+                seguro: 2,
+                derechos: 16,
+                estadistica: 0,
+                iva: 10.5,
+                ivaAdicional: 0,
+                ganancia: 0,
+                iibb: 0
+            },
+            {
+                id: 4,
+                posicion: '21% + 0D + 0E',
+                flete: 3,
+                seguro: 2,
+                derechos: 0,
+                estadistica: 0,
+                iva: 21,
+                ivaAdicional: 0,
+                ganancia: 0,
+                iibb: 0
+            },
+            {
+                id: 5,
+                posicion: '21% + 20D + 3E',
+                flete: 3,
+                seguro: 2,
+                derechos: 20,
+                estadistica: 0,
+                iva: 21,
+                ivaAdicional: 0,
+                ganancia: 0,
+                iibb: 0
+            },
+            {
+                id: 6,
+                posicion: '21% + 35D + 3E',
+                flete: 3,
+                seguro: 2,
+                derechos: 35,
+                estadistica: 3,
+                iva: 21,
+                ivaAdicional: 0,
+                ganancia: 0,
+                iibb: 0
+            },
+            {
+                id: 7,
+                posicion: 'Cambio de PA',
+                flete: 3,
+                seguro: 2,
+                derechos: 0,
+                estadistica: 0,
+                iva: 10.5,
+                ivaAdicional: 0,
+                ganancia: 0,
+                iibb: 0
+            }
+        ];
+        let dolarOficial = 1088;
+        let dolarBlue = 1255;
+        let datosGenerales = {
+            miami: {
+                costoKilo: 70,
+                cambioPA: 250,
+                costoKGCourier: 13.5,
+                costoKGCargaGeneral: 5,
+                almacenaje: 0.9,
+                gastosOperativos: 27,
+                gastosOrigen: 0
+            },
+            hongkong: {
+                costoKilo: 15,
+                cambioPA: 300,
+                costoKGCourier: 27.5,
+                costoKGCargaGeneral: 11,
+                almacenaje: 4.512,
+                gastosOperativos: 27,
+                gastosOrigen: 0
+            },
+            varios: {
+                lcl: 5,
+                resolucion3244: 10,
+                seguro: 24.75,
+                envioDomicilio: 10,
+                ajusteDolarANA: 1.01,
+                percepcionIIBB: 0.81
+            }
+        };
+        let pesos = [
+            {
+                id: 1,
+                producto: 'Smartphone',
+                peso: 0.3
+            },
+            {
+                id: 2,
+                producto: 'Laptop',
+                peso: 2.5
+            },
+            {
+                id: 3,
+                producto: 'Tablet',
+                peso: 0.7
+            },
+            {
+                id: 4,
+                producto: 'Smart TV 32"',
+                peso: 5.8
+            },
+            {
+                id: 5,
+                producto: 'Auriculares',
+                peso: 0.2
+            }
+        ];
+        
+        // Configuración GitHub API
+        const GITHUB_CONFIG = {
+            owner: 'exxastore',
+            repo: 'comex',
+            path: 'data/',
+            token: '' // En una implementación real, esto se manejaría de forma segura
+        };
+        
+        // Función para cargar datos desde GitHub
+        async function loadFromGitHub(dataPath) {
+            try {
+                // Esta es una simulación - en un entorno real se haría una llamada a la API de GitHub
+                // usando fetch para obtener contenido del repositorio
+                console.log(`Loading data from GitHub: ${dataPath}`);
+                
+                // Simulación: primero intentamos obtener de localStorage como caché
+                const cachedData = localStorage.getItem(`github_${dataPath}`);
+                if (cachedData) {
+                    return JSON.parse(cachedData);
+                }
+                
+                // En una implementación real, haríamos una solicitud a la API de GitHub como:
+                // const response = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}${dataPath}`, {
+                //     headers: GITHUB_CONFIG.token ? { Authorization: `token ${GITHUB_CONFIG.token}` } : {}
+                // });
+                // const data = await response.json();
+                // const content = atob(data.content);
+                // return JSON.parse(content);
+                
+                // Por ahora, retornamos datos por defecto
+                return null;
+            } catch (error) {
+                console.error(`Error loading data from GitHub: ${error}`);
+                return null;
+            }
+        }
+        
+        // Función para guardar datos en GitHub
+        async function saveToGitHub(dataPath, data) {
+            try {
+                // Esta es una simulación - en un entorno real se haría una llamada a la API de GitHub
+                console.log(`Saving data to GitHub: ${dataPath}`);
+                console.log(data);
+                
+                // Guardar en localStorage como caché local
+                localStorage.setItem(`github_${dataPath}`, JSON.stringify(data));
+                
+                // En una implementación real, obtendríamos primero el archivo si existe
+                // const checkResponse = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}${dataPath}`, {
+                //     headers: GITHUB_CONFIG.token ? { Authorization: `token ${GITHUB_CONFIG.token}` } : {}
+                // });
+                
+                // const content = JSON.stringify(data, null, 2);
+                // const encodedContent = btoa(content);
+                
+                // let sha;
+                // if (checkResponse.ok) {
+                //     const fileInfo = await checkResponse.json();
+                //     sha = fileInfo.sha;
+                // }
+                
+                // Y luego enviaríamos la solicitud para crear/actualizar el archivo
+                // await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}${dataPath}`, {
+                //     method: 'PUT',
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //         Authorization: `token ${GITHUB_CONFIG.token}`
+                //     },
+                //     body: JSON.stringify({
+                //         message: `Update ${dataPath}`,
+                //         content: encodedContent,
+                //         sha: sha
+                //     })
+                // });
+                
+                return true;
+            } catch (error) {
+                console.error(`Error saving data to GitHub: ${error}`);
+                return false;
+            }
+        }
+        
+        // Cargar datos desde GitHub al iniciar
+        async function cargarDatosGuardados() {
+            // Cargar posiciones arancelarias
+            const posicionesSaved = await loadFromGitHub('posiciones.json');
+            if (posicionesSaved) {
+                posicionesArancelarias = posicionesSaved;
+            } else {
+                // Datos iniciales si no hay datos guardados
+                posicionesArancelarias = [
+                    {
+                        id: 1,
+                        posicion: '8517.12.31',
+                        flete: 5,
+                        seguro: 1,
+                        derechos: 16,
+                        estadistica: 2.5,
+                        iva: 21,
+                        ivaAdicional: 10.5,
+                        ganancia: 30,
+                        iibb: 3
+                    },
+                    {
+                        id: 2,
+                        posicion: '8471.30.00',
+                        flete: 4,
+                        seguro: 1.5,
+                        derechos: 8,
+                        estadistica: 2.5,
+                        iva: 21,
+                        ivaAdicional: 0,
+                        ganancia: 25,
+                        iibb: 3.5
+                    }
+                ];
+                await guardarPosicionesArancelarias();
+            }
+            
+            // Cargar valores del dólar
+            const dolaresSaved = await loadFromGitHub('dolares.json');
+            if (dolaresSaved) {
+                dolarOficial = dolaresSaved.oficial;
+                dolarBlue = dolaresSaved.blue;
+            } else {
+                await guardarValoresDolar();
+            }
+            
+            // Cargar datos generales
+            const datosGeneralesSaved = await loadFromGitHub('datos_generales.json');
+            if (datosGeneralesSaved) {
+                datosGenerales = datosGeneralesSaved;
+            } else {
+                await guardarDatosGenerales();
+            }
+            
+            // Cargar pesos
+            const pesosSaved = await loadFromGitHub('pesos.json');
+            if (pesosSaved) {
+                pesos = pesosSaved;
+            } else {
+                // Datos iniciales si no hay datos guardados
+                pesos = [
+                    {
+                        id: 1,
+                        producto: 'Smartphone',
+                        peso: 0.3
+                    },
+                    {
+                        id: 2,
+                        producto: 'Laptop',
+                        peso: 2.5
+                    }
+                ];
+                await guardarPesos();
+            }
+        }
+        
+        // Funciones para guardar datos en GitHub
+        async function guardarPosicionesArancelarias() {
+            return await saveToGitHub('posiciones.json', posicionesArancelarias);
+        }
+        
+        async function guardarValoresDolar() {
+            return await saveToGitHub('dolares.json', { oficial: dolarOficial, blue: dolarBlue });
+        }
+        
+        async function guardarDatosGenerales() {
+            return await saveToGitHub('datos_generales.json', datosGenerales);
+        }
+        
+        async function guardarPesos() {
+            return await saveToGitHub('pesos.json', pesos);
+        }
+        
+        function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const user = validUsers.find(u => u.email === email && u.password === password);
+
+            if (user) {
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('appSection').style.display = 'block';
+                document.getElementById('welcomeMessage').textContent = `¡Hola, ${email}!`;
+                document.getElementById('loginError').textContent = '';
+                
+                // Cargar datos después del login
+                cargarDatosDespuesDeLogin();
+                
+                // Activar la opción de importación por defecto
+                const importMenuItem = document.querySelector('.sidebar li.active');
+                activateMenuItem(importMenuItem, 'importacion');
+            } else {
+                document.getElementById('loginError').textContent = 'Usuario o contraseña incorrectos';
+            }
+        }
+
+        function logout() {
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('appSection').style.display = 'none';
+            document.getElementById('email').value = 'prueba';
+            document.getElementById('password').value = '123';
+            document.getElementById('welcomeMessage').textContent = '';
+        }
+        
+        function activateMenuItem(element, option) {
+            // Guardar datos del formulario de importación si estamos saliendo de esa sección
+            const currentActive = document.querySelector('.sidebar li.active');
+            if (currentActive && currentActive.textContent === 'Importación') {
+                guardarDatosFormularioImportacion();
+            }
+            
+            // Desactivar el elemento activo actual
+            if (currentActive) {
+                currentActive.classList.remove('active');
+            }
+            
+            // Activar el nuevo elemento
+            element.classList.add('active');
+            
+            // Actualizar el contenido según la opción seleccionada
+            const contentArea = document.getElementById('contentArea');
+            
+            switch(option) {
+                case 'datos_generales':
+                    contentArea.innerHTML = `
+                        <h1 class="page-title">Datos Generales</h1>
+                        
+                        <div class="config-section">
+                            <h3>Miami</h3>
+                            <div class="config-field">
+                                <label for="miami-costo-kilo">Costo por Kilo (USD):</label>
+                                <input type="number" id="miami-costo-kilo" step="0.01" min="0" value="${datosGenerales.miami.costoKilo}">
+                            </div>
+                            <div class="config-field">
+                                <label for="miami-cambio-pa">Cambio de PA (USD):</label>
+                                <input type="number" id="miami-cambio-pa" step="0.01" min="0" value="${datosGenerales.miami.cambioPA}">
+                            </div>
+                            <div class="config-field">
+                                <label for="miami-costo-kg-courier">Costo KG Courier (USD):</label>
+                                <input type="number" id="miami-costo-kg-courier" step="0.01" min="0" value="${datosGenerales.miami.costoKGCourier}">
+                            </div>
+                            <div class="config-field">
+                                <label for="miami-costo-kg-carga">Costo KG Carga General (USD):</label>
+                                <input type="number" id="miami-costo-kg-carga" step="0.01" min="0" value="${datosGenerales.miami.costoKGCargaGeneral}">
+                            </div>
+                            <div class="config-field">
+                                <label for="miami-almacenaje">Almacenaje (USD):</label>
+                                <input type="number" id="miami-almacenaje" step="0.01" min="0" value="${datosGenerales.miami.almacenaje}">
+                            </div>
+                            <div class="config-field">
+                                <label for="miami-gastos-operativos">Gastos Operativos (USD):</label>
+                                <input type="number" id="miami-gastos-operativos" step="0.01" min="0" value="${datosGenerales.miami.gastosOperativos}">
+                            </div>
+                            <div class="config-field">
+                                <label for="miami-gastos-origen">Gastos de Origen (USD):</label>
+                                <input type="number" id="miami-gastos-origen" step="0.01" min="0" value="${datosGenerales.miami.gastosOrigen}">
+                            </div>
+                        </div>
+                        
+                        <div class="config-section">
+                            <h3>Hong Kong</h3>
+                            <div class="config-field">
+                                <label for="hongkong-costo-kilo">Costo por Kilo (USD):</label>
+                                <input type="number" id="hongkong-costo-kilo" step="0.01" min="0" value="${datosGenerales.hongkong.costoKilo}">
+                            </div>
+                            <div class="config-field">
+                                <label for="hongkong-cambio-pa">Cambio de PA (USD):</label>
+                                <input type="number" id="hongkong-cambio-pa" step="0.01" min="0" value="${datosGenerales.hongkong.cambioPA}">
+                            </div>
+                            <div class="config-field">
+                                <label for="hongkong-costo-kg-courier">Costo KG Courier (USD):</label>
+                                <input type="number" id="hongkong-costo-kg-courier" step="0.01" min="0" value="${datosGenerales.hongkong.costoKGCourier}">
+                            </div>
+                            <div class="config-field">
+                                <label for="hongkong-costo-kg-carga">Costo KG Carga General (USD):</label>
+                                <input type="number" id="hongkong-costo-kg-carga" step="0.01" min="0" value="${datosGenerales.hongkong.costoKGCargaGeneral}">
+                            </div>
+                            <div class="config-field">
+                                <label for="hongkong-almacenaje">Almacenaje (USD):</label>
+                                <input type="number" id="hongkong-almacenaje" step="0.01" min="0" value="${datosGenerales.hongkong.almacenaje}">
+                            </div>
+                            <div class="config-field">
+                                <label for="hongkong-gastos-operativos">Gastos Operativos (USD):</label>
+                                <input type="number" id="hongkong-gastos-operativos" step="0.01" min="0" value="${datosGenerales.hongkong.gastosOperativos}">
+                            </div>
+                            <div class="config-field">
+                                <label for="hongkong-gastos-origen">Gastos de Origen (USD):</label>
+                                <input type="number" id="hongkong-gastos-origen" step="0.01" min="0" value="${datosGenerales.hongkong.gastosOrigen}">
+                            </div>
+                        </div>
+                        
+                        <div class="config-section">
+                            <h3>Varios</h3>
+                            <div class="config-field">
+                                <label for="varios-lcl">LCL (USD):</label>
+                                <input type="number" id="varios-lcl" step="0.01" min="0" value="${datosGenerales.varios.lcl}">
+                            </div>
+                            <div class="config-field">
+                                <label for="varios-resolucion">Resolución 3244 (USD):</label>
+                                <input type="number" id="varios-resolucion" step="0.01" min="0" value="${datosGenerales.varios.resolucion3244}">
+                            </div>
+                            <div class="config-field">
+                                <label for="varios-seguro">Seguro (USD):</label>
+                                <input type="number" id="varios-seguro" step="0.01" min="0" value="${datosGenerales.varios.seguro}">
+                            </div>
+                            <div class="config-field">
+                                <label for="varios-envio-domicilio">Envío a Domicilio (USD):</label>
+                                <input type="number" id="varios-envio-domicilio" step="0.01" min="0" value="${datosGenerales.varios.envioDomicilio}">
+                            </div>
+                            <div class="config-field">
+                                <label for="varios-ajuste-dolar">Ajuste Dolar ANA (%):</label>
+                                <input type="number" id="varios-ajuste-dolar" step="0.01" min="0" value="${datosGenerales.varios.ajusteDolarANA}">
+                            </div>
+                            <div class="config-field">
+                                <label for="varios-percepcion-iibb">Percepción IIBB (%):</label>
+                                <input type="number" id="varios-percepcion-iibb" step="0.01" min="0" value="${datosGenerales.varios.percepcionIIBB}">
+                            </div>
+                        </div>
+
+                        <div class="config-actions" style="text-align: center; margin-top: 20px; margin-bottom: 30px;">
+                            <button class="edit-dolar-btn" style="width: auto; padding: 8px 20px;" onclick="guardarTodosDatosGenerales()">Guardar Cambios</button>
+                        </div>
+                    `;
+                    break;
+                case 'dolar':
+                    contentArea.innerHTML = `
+                        <h1 class="page-title">Información de Dolar</h1>
+                        <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: flex-start;">
+                            <div class="dolar-card">
+                                <div class="dolar-tipo">Dolar Oficial</div>
+                                <div class="dolar-valor">$${dolarOficial}</div>
+                                <button class="edit-dolar-btn" onclick="editarDolar('oficial')">Editar</button>
+                                <div id="dolar-oficial-form" class="dolar-edit-form">
+                                    <div class="form-group">
+                                        <label for="valor-dolar-oficial">Nuevo valor:</label>
+                                        <input type="number" id="valor-dolar-oficial" step="0.01" min="0" value="${dolarOficial}">
+                                    </div>
+                                    <button class="edit-dolar-btn save-dolar-btn" onclick="guardarDolar('oficial')">Guardar</button>
+                                </div>
+                            </div>
+                            <div class="dolar-card">
+                                <div class="dolar-tipo">Dolar Blue</div>
+                                <div class="dolar-valor">$${dolarBlue}</div>
+                                <button class="edit-dolar-btn" onclick="editarDolar('blue')">Editar</button>
+                                <div id="dolar-blue-form" class="dolar-edit-form">
+                                    <div class="form-group">
+                                        <label for="valor-dolar-blue">Nuevo valor:</label>
+                                        <input type="number" id="valor-dolar-blue" step="0.01" min="0" value="${dolarBlue}">
+                                    </div>
+                                    <button class="edit-dolar-btn save-dolar-btn" onclick="guardarDolar('blue')">Guardar</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'importacion':
+                    let importHTML = `
+                        <h1 class="page-title">Importación</h1>
+                        <div class="import-form">
+                            <h3>Simulación de Importación</h3>
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="product-name">Nombre del Producto:</label>
+                                        <input type="text" id="product-name" required>
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="fob-price">Precio FOB (USD):</label>
+                                        <input type="number" id="fob-price" step="0.01" min="0" required oninput="calcularTotales()">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="quantity">Cantidad:</label>
+                                        <input type="number" id="quantity" min="1" required value="1" oninput="calcularTotales()">
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="unit-weight">Peso Unitario (kg):</label>
+                                        <input type="number" id="unit-weight" step="0.01" min="0" required oninput="calcularTotales()">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="divider"></div>
+                            
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="fob-total">FOB Total (USD):</label>
+                                        <div id="fob-total" class="calculated-field">0.00</div>
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="weight-total">Peso Total (kg):</label>
+                                        <div id="weight-total" class="calculated-field">0.00</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="divider"></div>
+                            
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="origin">Origen:</label>
+                                        <select id="origin" required>
+                                            <option value="">Seleccionar origen</option>
+                                            <option value="miami">Miami</option>
+                                            <option value="hongkong">Hong Kong</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="import-type">Tipo de Importación:</label>
+                                        <select id="import-type" required>
+                                            <option value="">Seleccionar tipo</option>
+                                            <option value="aerea">Importacion general aerea</option>
+                                            <option value="maritima">Importacion general maritima</option>
+                                            <option value="courier">Courier</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="tariff-position">Posición Arancelaria:</label>
+                                <select id="tariff-position" required>
+                                    <option value="">Seleccionar posición arancelaria</option>
+                                    ${generarOpcionesPosiciones()}
+                                </select>
+                            </div>
+                            
+                            <div class="form-row" style="justify-content: space-between;">
+                                <button class="calculate-btn" onclick="calculateImport()">Calcular Importación</button>
+                                <button class="calculate-btn" style="background-color: #e74c3c;" onclick="borrarFormularioImportacion()">Borrar</button>
+                            </div>
+                            
+                            <div id="result-container"></div>
+                        </div>
+                    `;
+                    contentArea.innerHTML = importHTML;
+                    
+                    // Cargar datos guardados del formulario
+                    cargarDatosFormularioImportacion();
+                    break;
+                case 'arancelarias':
+                    contentArea.innerHTML = `
+                        <h1 class="page-title">Posiciones Arancelarias</h1>
+                        <div class="posiciones-container">
+                            <div class="crud-header" style="margin-bottom: 15px;">
+                                <h3>Listado de Posiciones Arancelarias</h3>
+                                <button class="crud-add-btn" onclick="showAddForm()">Nueva Posición</button>
+                            </div>
+                            
+                            <div class="add-form">
+                                <h3>Agregar Posición Arancelaria</h3>
+                                <div class="form-row">
+                                    <div class="form-col">
+                                        <div class="form-group">
+                                            <label for="posicion">Posición:</label>
+                                            <input type="text" id="posicion" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-col">
+                                        <div class="form-group">
+                                            <label for="iva">IVA (%):</label>
+                                            <input type="number" id="iva" step="0.1" min="0" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-col">
+                                        <div class="form-group">
+                                            <label for="derechos">Derechos (%):</label>
+                                            <input type="number" id="derechos" step="0.1" min="0" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-col">
+                                        <div class="form-group">
+                                            <label for="estadistica">Estadistica (%):</label>
+                                            <input type="number" id="estadistica" step="0.1" min="0" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-col">
+                                        <div class="form-group">
+                                            <label for="flete">Flete (%):</label>
+                                            <input type="number" id="flete" step="0.1" min="0" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-col">
+                                        <div class="form-group">
+                                            <label for="seguro">Seguro (%):</label>
+                                            <input type="number" id="seguro" step="0.1" min="0" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-col">
+                                        <div class="form-group">
+                                            <label for="iva-adicional">IVA Adicional (%):</label>
+                                            <input type="number" id="iva-adicional" step="0.1" min="0" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-col">
+                                        <div class="form-group">
+                                            <label for="ganancia">Ganancia (%):</label>
+                                            <input type="number" id="ganancia" step="0.1" min="0" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-col">
+                                        <div class="form-group">
+                                            <label for="iibb">IIBB (%):</label>
+                                            <input type="number" id="iibb" step="0.1" min="0" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <button onclick="savePosition()" class="calculate-btn" style="width: 120px;">Guardar</button>
+                                    <button onclick="cancelForm()" style="background-color: #e74c3c; margin-left: 10px; width: 120px;">Cancelar</button>
+                                </div>
+                            </div>
+                            
+                            <table class="crud-table">
+                                <thead>
+                                    <tr>
+                                        <th class="posicion-col sort-posicion" onclick="sortPosiciones('posicion')" style="cursor: pointer;">
+                                            Posición <span class="sort-indicator"></span>
+                                        </th>
+                                        <th class="sort-iva" onclick="sortPosiciones('iva')" style="cursor: pointer;">
+                                            IVA <span class="sort-indicator"></span>
+                                        </th>
+                                        <th class="sort-derechos" onclick="sortPosiciones('derechos')" style="cursor: pointer;">
+                                            Derechos <span class="sort-indicator"></span>
+                                        </th>
+                                        <th class="sort-estadistica" onclick="sortPosiciones('estadistica')" style="cursor: pointer;">
+                                            Estadist. <span class="sort-indicator"></span>
+                                        </th>
+                                        <th class="sort-flete" onclick="sortPosiciones('flete')" style="cursor: pointer;">
+                                            Flete <span class="sort-indicator"></span>
+                                        </th>
+                                        <th class="sort-seguro" onclick="sortPosiciones('seguro')" style="cursor: pointer;">
+                                            Seguro <span class="sort-indicator"></span>
+                                        </th>
+                                        <th class="sort-ivaAdicional" onclick="sortPosiciones('ivaAdicional')" style="cursor: pointer;">
+                                            IVA Ad. <span class="sort-indicator"></span>
+                                        </th>
+                                        <th class="sort-ganancia" onclick="sortPosiciones('ganancia')" style="cursor: pointer;">
+                                            Ganancia <span class="sort-indicator"></span>
+                                        </th>
+                                        <th class="sort-iibb" onclick="sortPosiciones('iibb')" style="cursor: pointer;">
+                                            IIBB <span class="sort-indicator"></span>
+                                        </th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="posiciones-body">
+                                    <!-- Aquí se cargarán dinámicamente las posiciones arancelarias -->
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    // Inicializar el ordenamiento por posición ascendente
+                    renderPosicionesTable('posicion', 'asc');
+                    updateSortIndicators('posicion', 'asc');
+                    break;
+                case 'pesos':
+                    contentArea.innerHTML = `
+                        <h1 class="page-title">Gestión de Pesos</h1>
+                        <div class="pesos-crud-container">
+                            <div class="crud-header">
+                                <h3>Listado de Productos y Pesos</h3>
+                                <button class="crud-add-btn" onclick="showAddPesoForm()">Nuevo Producto</button>
+                            </div>
+                            
+                            <div id="pesos-crud-form" class="crud-form">
+                                <h4 id="pesos-form-title">Agregar Producto y Peso</h4>
+                                <input type="hidden" id="peso-id">
+                                <div class="form-row">
+                                    <div class="form-col">
+                                        <div class="form-group">
+                                            <label for="producto">Producto:</label>
+                                            <input type="text" id="producto" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-col">
+                                        <div class="form-group">
+                                            <label for="peso">Peso (kg):</label>
+                                            <input type="number" id="peso" step="0.01" min="0" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <button onclick="savePeso()" class="calculate-btn" style="width: 120px;">Guardar</button>
+                                    <button onclick="cancelPesoForm()" style="background-color: #e74c3c; margin-left: 10px; width: 120px;">Cancelar</button>
+                                </div>
+                            </div>
+                            
+                            <table class="crud-table">
+                                <thead>
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Peso (kg)</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pesos-body">
+                                    <!-- Aquí se cargarán dinámicamente los productos y pesos -->
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    renderPesosTable();
+                    break;
+                default:
+                    contentArea.innerHTML = '<h1 class="page-title">Selecciona una opción</h1><p>Elige una opción de la barra lateral para ver su contenido.</p>';
+            }
+        }
+        
+        // Funciones para editar valores del dólar
+        function editarDolar(tipo) {
+            const formId = `dolar-${tipo}-form`;
+            const formElement = document.getElementById(formId);
+            formElement.style.display = formElement.style.display === 'block' ? 'none' : 'block';
+        }
+        
+        async function guardarDolar(tipo) {
+            if (tipo === 'oficial') {
+                const nuevoValor = parseFloat(document.getElementById('valor-dolar-oficial').value);
+                if (!isNaN(nuevoValor) && nuevoValor > 0) {
+                    dolarOficial = nuevoValor;
+                    document.querySelector('.dolar-card:first-child .dolar-valor').textContent = `$${dolarOficial}`;
+                    document.getElementById('dolar-oficial-form').style.display = 'none';
+                    await guardarValoresDolar();
+                    alert('Valor del Dolar Oficial guardado correctamente.');
+                } else {
+                    alert('Por favor, ingrese un valor válido para el Dolar Oficial.');
+                }
+            } else if (tipo === 'blue') {
+                const nuevoValor = parseFloat(document.getElementById('valor-dolar-blue').value);
+                if (!isNaN(nuevoValor) && nuevoValor > 0) {
+                    dolarBlue = nuevoValor;
+                    document.querySelector('.dolar-card:nth-child(2) .dolar-valor').textContent = `$${dolarBlue}`;
+                    document.getElementById('dolar-blue-form').style.display = 'none';
+                    await guardarValoresDolar();
+                    alert('Valor del Dolar Blue guardado correctamente.');
+                } else {
+                    alert('Por favor, ingrese un valor válido para el Dolar Blue.');
+                }
+            }
+        }
+        
+        // Función para generar opciones del select de posiciones arancelarias
+        function generarOpcionesPosiciones() {
+            console.log('Generando opciones de posiciones arancelarias');
+            // Verificar si hay posiciones arancelarias disponibles
+            if (!posicionesArancelarias || posicionesArancelarias.length === 0) {
+                console.log('No hay posiciones arancelarias disponibles para generar opciones');
+                return '<option value="">No hay posiciones disponibles</option>';
+            }
+            
+            console.log('Número de posiciones disponibles:', posicionesArancelarias.length);
+            let options = '';
+            posicionesArancelarias.forEach(item => {
+                options += `<option value="${item.id}">${item.posicion}</option>`;
+            });
+            return options;
+        }
+        
+        function calcularTotales() {
+            const fobPrice = parseFloat(document.getElementById('fob-price').value) || 0;
+            const quantity = parseInt(document.getElementById('quantity').value) || 0;
+            const unitWeight = parseFloat(document.getElementById('unit-weight').value) || 0;
+            
+            const fobTotal = fobPrice * quantity;
+            const weightTotal = unitWeight * quantity;
+            
+            document.getElementById('fob-total').textContent = fobTotal.toFixed(2);
+            document.getElementById('weight-total').textContent = weightTotal.toFixed(2);
+        }
+        
+        // Función para formatear números con punto como separador de miles y coma como separador decimal
+        function formatearNumero(numero) {
+            return numero.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+        
+        function calculateImport() {
+            const productName = document.getElementById('product-name').value;
+            const fobPrice = parseFloat(document.getElementById('fob-price').value);
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const unitWeight = parseFloat(document.getElementById('unit-weight').value);
+            const origin = document.getElementById('origin').value;
+            const importType = document.getElementById('import-type').value;
+            const tariffPositionId = document.getElementById('tariff-position').value;
+            
+            // Validar que todos los campos estén completos
+            if (!productName || isNaN(fobPrice) || isNaN(quantity) || isNaN(unitWeight) || !origin || !importType || !tariffPositionId) {
+                alert('Por favor, complete todos los campos correctamente.');
+                return;
+            }
+            
+            // Obtener la posición arancelaria seleccionada
+            const selectedPosition = posicionesArancelarias.find(p => p.id == tariffPositionId);
+            if (!selectedPosition) {
+                alert('Por favor, seleccione una posición arancelaria válida.');
+                return;
+            }
+            
+            // Imprimir datos para depuración
+            console.log('Posición arancelaria seleccionada:', selectedPosition);
+            console.log('Tipo de ivaAdicional:', typeof selectedPosition.ivaAdicional);
+            console.log('Valor de ivaAdicional:', selectedPosition.ivaAdicional);
+            
+            // Cálculos simulados de importación
+            const totalFOB = fobPrice * quantity;
+            const totalWeight = unitWeight * quantity;
+            
+            // Valor A.N.A. es igual al FOB total multiplicado por el ajuste de dólar ANA
+            const ajusteDolarANA = 1 + (datosGenerales.varios.ajusteDolarANA / 100);
+            const valorANA = totalFOB * ajusteDolarANA;
+            
+            // Seguro calculado con el valor de datos generales
+            const seguro = datosGenerales.varios.seguro;
+            
+            // Flete es 0
+            const flete = 0;
+            
+            // Cálculo del CIF
+            const CIFValue = valorANA + seguro + flete;
+            
+            // Calcular derechos y estadística correctamente
+            // Los derechos se calculan sobre el valor CIF
+            const derechos = CIFValue * (selectedPosition.derechos / 100);
+            // La estadística se calcula sobre el valor CIF
+            const estadistica = CIFValue * (selectedPosition.estadistica / 100);
+            
+            // Guardar los datos del formulario para restaurarlos después
+            const formData = {
+                productName,
+                fobPrice,
+                quantity,
+                unitWeight,
+                origin,
+                importType,
+                tariffPositionId
+            };
+            localStorage.setItem('importFormData', JSON.stringify(formData));
+            
+            // Gastos según el origen y tipo de importación
+            let gastosOperativos = 0;
+            let res3244 = datosGenerales.varios.resolucion3244;
+            let envioDomicilio = datosGenerales.varios.envioDomicilio;
+            let cambioPA = 0;
+            let costoKilo = 0;
+            
+            // Obtener el texto del tipo de importación y origen para mostrar
+            let origenText = origin === 'miami' ? 'Miami' : 'Hong Kong';
+            let importTypeText = '';
+            const importTypeElement = document.getElementById('import-type');
+            if (importTypeElement && importTypeElement.selectedIndex >= 0) {
+                importTypeText = importTypeElement.options[importTypeElement.selectedIndex].text;
+            }
+            
+            // Cambio de PA solo si la posición arancelaria incluye "Cambio de PA"
+            console.log('Revisando posición arancelaria:', selectedPosition.posicion);
+            if (selectedPosition.posicion.toLowerCase().includes('cambio de pa')) {
+                console.log('Posición incluye "Cambio de PA", aplicando valor');
+                if (origin === 'miami') {
+                    cambioPA = datosGenerales.miami.cambioPA;
+                } else if (origin === 'hongkong') {
+                    cambioPA = datosGenerales.hongkong.cambioPA;
+                }
+            } else {
+                cambioPA = 0;
+            }
+            
+            if (origin === 'miami') {
+                gastosOperativos = datosGenerales.miami.gastosOperativos;
+                
+                // Seleccionar el costo por kilo según el tipo de importación
+                if (importType === 'courier') {
+                    costoKilo = datosGenerales.miami.costoKGCourier;
+                } else {
+                    costoKilo = datosGenerales.miami.costoKGCargaGeneral;
+                }
+            } else if (origin === 'hongkong') {
+                gastosOperativos = datosGenerales.hongkong.gastosOperativos;
+                
+                // Seleccionar el costo por kilo según el tipo de importación
+                if (importType === 'courier') {
+                    costoKilo = datosGenerales.hongkong.costoKGCourier;
+                } else {
+                    costoKilo = datosGenerales.hongkong.costoKGCargaGeneral;
+                }
+            }
+            
+            // Calcular el almacenaje según el peso total
+            let almacenaje = 0;
+            if (origin === 'miami') {
+                almacenaje = totalWeight * datosGenerales.miami.almacenaje;
+            } else if (origin === 'hongkong') {
+                almacenaje = totalWeight * datosGenerales.hongkong.almacenaje;
+            }
+            
+            // Calcular el Flete Internacional
+            const fleteInternacional = totalWeight * costoKilo;
+            
+            // Neto gravado y no gravado según los requerimientos
+            const netoGravado = res3244 + seguro + gastosOperativos + almacenaje;
+            const noGravado = envioDomicilio + fleteInternacional;
+            
+            // Calcular IVA según posición arancelaria
+            let iva21 = 0;
+            let iva105 = 0;
+            
+            // IVA 21% se calcula como el 21% de la suma de (almacenaje, res 3244, seguro, gastos operativos)
+            iva21 = (almacenaje + res3244 + seguro + gastosOperativos) * 0.21;
+            
+            // CORRECCIÓN: Verificamos el campo correcto para el cálculo del IVA
+            console.log('Valor de iva en posición arancelaria:', selectedPosition.iva);
+            
+            // Lógica corregida para IVA 10,5% y 21%
+            // Si la posición arancelaria tiene IVA 10,5%, calcular el 10,5% del valor A.N.A.
+            if (selectedPosition.iva === 10.5) {
+                console.log('Posición con IVA 10,5% - Aplicando al valor A.N.A.:', valorANA);
+                iva105 = valorANA * 0.105;
+                iva21 = (almacenaje + res3244 + seguro + gastosOperativos) * 0.21; // Solo para estos conceptos
+            } 
+            // Si la posición arancelaria tiene IVA 21%, calcular el 21% del valor A.N.A.
+            else if (selectedPosition.iva === 21) {
+                console.log('Posición con IVA 21% - Aplicando al valor A.N.A.:', valorANA);
+                iva21 += valorANA * 0.21; // Se adiciona al IVA 21% calculado previamente
+                iva105 = 0; // No se aplica IVA 10,5%
+            }
+            // Cualquier otro caso
+            else {
+                console.log('Posición con IVA diferente - No se aplica IVA al valor A.N.A.');
+                iva105 = 0;
+            }
+            
+            // Percepción IIBB es el valor de Datos Generales
+            const percepcionIIBB = datosGenerales.varios.percepcionIIBB;
+            
+            // Total según especificación - Incluye también seguro, IVA 21% y percepción IIBB
+            const total = derechos + estadistica + fleteInternacional + almacenaje + res3244 + gastosOperativos + envioDomicilio + iva105 + iva21 + seguro + cambioPA + percepcionIIBB;
+            
+            // Costo total y porcentaje
+            const costoMercaderia = totalFOB;
+            const costoTotalImportacion = total;
+            // Cálculo del porcentaje de importación (siempre positivo)
+            const porcentajeImportacion = Math.abs((total / costoMercaderia) * 100);
+            
+            // Mostrar todos los valores de cálculo por consola para depurar
+            console.log('FOB Total:', totalFOB);
+            console.log('Ajuste Dólar ANA:', ajusteDolarANA);
+            console.log('Valor A.N.A. (con ajuste):', valorANA);
+            console.log('Seguro:', seguro);
+            console.log('Flete:', flete);
+            console.log('CIF Value:', CIFValue);
+            console.log('Derechos (' + selectedPosition.derechos + '%):', derechos);
+            console.log('Estadística (' + selectedPosition.estadistica + '%):', estadistica);
+            console.log('Flete Internacional:', fleteInternacional);
+            console.log('Almacenaje (peso total x tarifa):', almacenaje);
+            console.log('IVA 21%:', iva21);
+            console.log('IVA 10,5%:', iva105);
+            console.log('Neto Gravado:', netoGravado);
+            console.log('No Gravado:', noGravado);
+            console.log('Percepción IIBB:', percepcionIIBB);
+            console.log('Porcentaje de Importación:', porcentajeImportacion);
+            
+            // Crear la nueva pantalla
+            const contentArea = document.getElementById('contentArea');
+            const prevContent = contentArea.innerHTML;
+            
+            contentArea.innerHTML = `
+                <h1 class="page-title">Cálculo de Importación</h1>
+                <div class="import-form compact-result">
+                    <h3>${productName} - ${selectedPosition.posicion} - ${origenText} - ${importTypeText}</h3>
+                    
+                    <div class="github-info">
+                        <strong>Información:</strong> Tipo de cambio: $ ${dolarOficial}
+                    </div>
+                    
+                    <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+                        <div style="flex: 1; min-width: 300px;">
+                            <div class="result-table">
+                                <div class="result-row">
+                                    <div class="result-label">Valor A.N.A. (ajustado ${datosGenerales.varios.ajusteDolarANA}%):</div>
+                                    <div class="result-value">$ ${formatearNumero(valorANA * dolarOficial)}</div>
+                                </div>
+                                <div class="result-row">
+                                    <div class="result-label">Seguro:</div>
+                                    <div class="result-value">$ ${formatearNumero(seguro * dolarOficial)}</div>
+                                </div>
+                                <div class="result-row" style="margin-bottom: 0;">
+                                    <div class="result-label">Flete:</div>
+                                    <div class="result-value">$ ${formatearNumero(flete * dolarOficial)}</div>
+                                </div>
+                                <div class="result-row result-cif">
+                                    <div class="result-label">CIF:</div>
+                                    <div class="result-value">$ ${formatearNumero(CIFValue * dolarOficial)}</div>
+                                </div>
+                                <div class="result-row">
+                                    <div class="result-label">Derechos:</div>
+                                    <div class="result-value">$ ${formatearNumero(derechos * dolarOficial)}</div>
+                                </div>
+                                <div class="result-row">
+                                    <div class="result-label">Estadistica:</div>
+                                    <div class="result-value">$ ${formatearNumero(estadistica * dolarOficial)}</div>
+                                </div>
+                                <div class="result-row">
+                                    <div class="result-label">Flete Internacional (${totalWeight} kg):</div>
+                                    <div class="result-value">$ ${formatearNumero(fleteInternacional * dolarOficial)}</div>
+                                </div>
+                                <div class="result-row">
+                                    <div class="result-label">Almacenaje (${totalWeight} kg):</div>
+                                    <div class="result-value">$ ${formatearNumero(almacenaje * dolarOficial)}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="flex: 1; min-width: 300px;">
+                            <div class="result-table">
+                                <div class="result-row">
+                                    <div class="result-label">Res 3244:</div>
+                                    <div class="result-value">$ ${formatearNumero(res3244 * dolarOficial)}</div>
+                                </div>
+                                <div class="result-row">
+                                    <div class="result-label">Gastos Operativos:</div>
+                                    <div class="result-value">$ ${formatearNumero(gastosOperativos * dolarOficial)}</div>
+                                </div>
+                                <div class="result-row">
+                                    <div class="result-label">Envío a Domicilio:</div>
+                                    <div class="result-value">$ ${formatearNumero(envioDomicilio * dolarOficial)}</div>
+                                </div>
+                                <div style="border-bottom: 1px solid #ccc; margin: 5px 0;"></div>
+                                <div class="result-row">
+                                    <div class="result-label">Neto Gravado:</div>
+                                    <div class="result-value">$ ${formatearNumero(netoGravado * dolarOficial)}</div>
+                                </div>
+                                <div class="result-row">
+                                    <div class="result-label">No Gravado:</div>
+                                    <div class="result-value">$ ${formatearNumero(noGravado * dolarOficial)}</div>
+                                </div>
+                                <div class="result-row">
+                                    <div class="result-label">IVA 10,5%:</div>
+                                    <div class="result-value">$ ${formatearNumero(iva105 * dolarOficial)}</div>
+                                </div>
+                                <div class="result-row">
+                                    <div class="result-label">IVA 21%:</div>
+                                    <div class="result-value">$ ${formatearNumero(iva21 * dolarOficial)}</div>
+                                </div>
+                                <div class="result-row">
+                                    <div class="result-label">Percepcion IIBB:</div>
+                                    <div class="result-value">$ ${formatearNumero(percepcionIIBB * dolarOficial)}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="result-table">
+                        <div class="result-row result-total">
+                            <div class="result-label">Total:</div>
+                            <div class="result-value">$ ${formatearNumero(total * dolarOficial)}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; flex-wrap: wrap; gap: 20px; margin-top: 15px;">
+                        <div style="flex: 1; min-width: 300px;">
+                            <div class="result-row">
+                                <div class="result-label">Cambio de PA:</div>
+                                <div class="result-value">$ ${formatearNumero(cambioPA * dolarBlue)}</div>
+                            </div>
+                        </div>
+                        
+                        <div style="flex: 1; min-width: 300px;">
+                            <div class="result-table">
+                                <div class="result-row">
+                                    <div class="result-label">Costo de la Mercadería:</div>
+                                    <div class="result-value">$ ${formatearNumero(costoMercaderia * dolarOficial)}</div>
+                                </div>
+                                <div class="result-row">
+                                    <div class="result-label">Costo Total de la Importación:</div>
+                                    <div class="result-value">$ ${formatearNumero(costoTotalImportacion * dolarOficial)}</div>
+                                </div>
+                                <div class="result-row">
+                                    <div class="result-label">Porcentaje de la Importación:</div>
+                                    <div class="result-value">${porcentajeImportacion.toFixed(2).replace('.', ',')}%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="buttons-row no-print">
+                        <button class="calculate-btn" style="width: 120px;" onclick="volverAImportacion()">Volver</button>
+                        <button class="calculate-btn print-btn" style="width: 120px;" onclick="imprimirCalculo()">Imprimir</button>
+                    </div>
+                    
+                    <div class="print-footer">
+                        BDC Trade Tech - Datos de referencia, no tomar como valores finales
+                    </div>
+                </div>
+            `;
+            
+            // Guardar la vista previa para poder restaurarla
+            localStorage.setItem('prevImportView', prevContent);
+        }
+        
+        // Función para imprimir el cálculo
+        function imprimirCalculo() {
+            // Guardar el estado original
+            const originalContent = document.body.innerHTML;
+            const printContent = document.querySelector('.import-form').cloneNode(true);
+            
+            // Crear un nuevo documento para imprimir
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write('<html><head><title>Cálculo de Importación</title>');
+            
+            // Copiar los estilos de la página actual
+            const styles = document.querySelectorAll('style');
+            styles.forEach(style => {
+                printWindow.document.write(style.outerHTML);
+            });
+            
+            // Agregar estilos adicionales específicos para la impresión
+            printWindow.document.write(`
+                <style>
+                    @page {
+                        size: A4;
+                        margin: 15mm !important;
+                    }
+                    body {
+                        padding: 0;
+                        margin: 0;
+                        font-family: Arial, sans-serif;
+                    }
+                    .import-form {
+                        width: 100%;
+                        box-sizing: border-box;
+                        font-size: 11pt;
+                        line-height: 1.3;
+                        padding: 0;
+                        margin: 0;
+                    }
+                    .github-info {
+                        font-size: 9pt;
+                        padding: 8px !important;
+                        margin: 10px 0 !important;
+                        border-left: 3px solid #1a73e8 !important;
+                        background-color: #f8f9fa !important;
+                    }
+                    .result-row {
+                        margin: 4px 0 !important;
+                        padding: 3px 0 !important;
+                        display: flex;
+                        justify-content: space-between;
+                        border-bottom: 1px solid #f0f0f0;
+                    }
+                    .result-value {
+                        text-align: right;
+                        min-width: 100px;
+                        font-weight: 500;
+                    }
+                    .result-label {
+                        font-weight: normal;
+                    }
+                    h3 {
+                        margin: 0 0 10px 0 !important;
+                        padding: 0 !important;
+                        font-size: 14pt;
+                        text-align: center;
+                        border-bottom: 1px solid #333;
+                        padding-bottom: 5px !important;
+                    }
+                    h1 {
+                        margin: 0 0 10px 0 !important;
+                        padding: 0 !important;
+                        font-size: 16pt;
+                        text-align: center;
+                    }
+                    .print-footer {
+                        position: fixed;
+                        bottom: 10mm;
+                        width: 100%;
+                        text-align: center;
+                        font-style: italic;
+                        font-size: 8pt;
+                        padding-top: 5px !important;
+                        border-top: 1px solid #ccc;
+                        color: #666;
+                    }
+                    .buttons-row, .no-print {
+                        display: none !important;
+                    }
+                    .result-table {
+                        margin-bottom: 10px !important;
+                        width: 100% !important;
+                    }
+                    .result-cif, .result-total {
+                        font-weight: bold;
+                        border-bottom: 1.5px solid #333 !important;
+                        margin-bottom: 8px !important;
+                        padding-bottom: 3px !important;
+                    }
+                    div[style*="display: flex"] {
+                        display: flex !important;
+                        flex-wrap: wrap !important;
+                        gap: 15px !important;
+                        margin: 15px 0 !important;
+                    }
+                    div[style*="flex: 1"] {
+                        flex: 1 !important;
+                        min-width: 45% !important;
+                        padding: 0 !important;
+                    }
+                </style>
+            `);
+            
+            printWindow.document.write('</head><body>');
+            printWindow.document.write('<div class="import-form compact-result">');
+            printWindow.document.write(printContent.innerHTML);
+            printWindow.document.write('</div></body></html>');
+            
+            printWindow.document.close();
+            
+            // Esperar a que los estilos se carguen y luego imprimir
+            printWindow.onload = function() {
+                setTimeout(function() {
+                    printWindow.print();
+                    // No cerrar la ventana automáticamente para permitir opciones de impresión
+                }, 500);
+            };
+        }
+        
+        function volverAImportacion() {
+            const contentArea = document.getElementById('contentArea');
+            const prevContent = localStorage.getItem('prevImportView');
+            if (prevContent) {
+                contentArea.innerHTML = prevContent;
+                
+                // Restaurar los datos del formulario
+                const formData = JSON.parse(localStorage.getItem('importFormData') || '{}');
+                if (formData.productName) {
+                    document.getElementById('product-name').value = formData.productName;
+                    document.getElementById('fob-price').value = formData.fobPrice;
+                    document.getElementById('quantity').value = formData.quantity;
+                    document.getElementById('unit-weight').value = formData.unitWeight;
+                    document.getElementById('origin').value = formData.origin;
+                    document.getElementById('import-type').value = formData.importType;
+                    document.getElementById('tariff-position').value = formData.tariffPositionId;
+                    
+                    // Recalcular los totales
+                    calcularTotales();
+                }
+            } else {
+                // Si por alguna razón no existe el contenido previo, recreamos la vista de importación
+                activateMenuItem(document.querySelector('.sidebar li.active'), 'importacion');
+            }
+        }
+        
+        // Funciones para el CRUD de posiciones arancelarias
+        function renderPosicionesTable(sortBy = 'posicion', sortDirection = 'asc') {
+            const tableBody = document.getElementById('posiciones-body');
+            if (!tableBody) return;
+            
+            console.log('Renderizando tabla de posiciones arancelarias');
+            console.log('Número de posiciones disponibles:', posicionesArancelarias.length);
+            
+            // Verificar si hay posiciones arancelarias disponibles
+            if (!posicionesArancelarias || posicionesArancelarias.length === 0) {
+                console.log('No hay posiciones arancelarias disponibles, utilizando valores predeterminados');
+                // Restaurar valores predeterminados para asegurar que siempre haya datos
+                posicionesArancelarias = [
+                    {
+                        id: 1,
+                        posicion: '10,5% + 0D + 0E',
+                        flete: 3,
+                        seguro: 2,
+                        derechos: 0,
+                        estadistica: 0,
+                        iva: 10.5,
+                        ivaAdicional: 0,
+                        ganancia: 0,
+                        iibb: 0
+                    },
+                    {
+                        id: 2,
+                        posicion: '10,5% + 10,8D + 0E',
+                        flete: 3,
+                        seguro: 2,
+                        derechos: 10.8,
+                        estadistica: 0,
+                        iva: 10.5,
+                        ivaAdicional: 0,
+                        ganancia: 0,
+                        iibb: 0
+                    },
+                    {
+                        id: 3,
+                        posicion: '10,5% + 16D + 0E',
+                        flete: 3,
+                        seguro: 2,
+                        derechos: 16,
+                        estadistica: 0,
+                        iva: 10.5,
+                        ivaAdicional: 0,
+                        ganancia: 0,
+                        iibb: 0
+                    },
+                    {
+                        id: 4,
+                        posicion: '21% + 0D + 0E',
+                        flete: 3,
+                        seguro: 2,
+                        derechos: 0,
+                        estadistica: 0,
+                        iva: 21,
+                        ivaAdicional: 0,
+                        ganancia: 0,
+                        iibb: 0
+                    },
+                    {
+                        id: 5,
+                        posicion: '21% + 20D + 3E',
+                        flete: 3,
+                        seguro: 2,
+                        derechos: 20,
+                        estadistica: 0,
+                        iva: 21,
+                        ivaAdicional: 0,
+                        ganancia: 0,
+                        iibb: 0
+                    },
+                    {
+                        id: 6,
+                        posicion: '21% + 35D + 3E',
+                        flete: 3,
+                        seguro: 2,
+                        derechos: 35,
+                        estadistica: 3,
+                        iva: 21,
+                        ivaAdicional: 0,
+                        ganancia: 0,
+                        iibb: 0
+                    },
+                    {
+                        id: 7,
+                        posicion: 'Cambio de PA',
+                        flete: 3,
+                        seguro: 2,
+                        derechos: 0,
+                        estadistica: 0,
+                        iva: 10.5,
+                        ivaAdicional: 0,
+                        ganancia: 0,
+                        iibb: 0
+                    }
+                ];
+                
+                // Guardar estos valores predeterminados en localStorage
+                localStorage.setItem('posicionesArancelarias', JSON.stringify(posicionesArancelarias));
+            }
+            
+            // Ordenar las posiciones arancelarias según el criterio seleccionado
+            const sortedPositions = [...posicionesArancelarias].sort((a, b) => {
+                let comparison = 0;
+                
+                // Ordenar por la propiedad seleccionada
+                if (typeof a[sortBy] === 'string') {
+                    comparison = a[sortBy].localeCompare(b[sortBy]);
+                } else {
+                    comparison = a[sortBy] - b[sortBy];
+                }
+                
+                // Invertir si es descendente
+                return sortDirection === 'desc' ? -comparison : comparison;
+            });
+            
+            tableBody.innerHTML = '';
+            
+            sortedPositions.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.posicion}</td>
+                    <td>${item.iva}%</td>
+                    <td>${item.derechos}%</td>
+                    <td>${item.estadistica}%</td>
+                    <td>${item.flete}%</td>
+                    <td>${item.seguro}%</td>
+                    <td>${item.ivaAdicional}%</td>
+                    <td>${item.ganancia}%</td>
+                    <td>${item.iibb}%</td>
+                    <td>
+                        <button class="crud-action-btn crud-edit-btn" onclick="editPosition(${item.id})">Editar</button>
+                        <button class="crud-action-btn crud-delete-btn" onclick="deletePosition(${item.id})">Eliminar</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+            
+            // También actualizar las opciones del selector en el formulario de importación
+            const tariffSelect = document.getElementById('tariff-position');
+            if (tariffSelect) {
+                tariffSelect.innerHTML = '<option value="">Seleccionar posición arancelaria</option>';
+                posicionesArancelarias.forEach(item => {
+                    tariffSelect.innerHTML += `<option value="${item.id}">${item.posicion}</option>`;
+                });
+            }
+        }
+        
+        function showAddForm() {
+            document.getElementById('crud-form').style.display = 'block';
+            document.getElementById('form-title').textContent = 'Agregar Posición Arancelaria';
+            document.getElementById('posicion-id').value = '';
+            document.getElementById('posicion').value = '';
+            document.getElementById('flete').value = '';
+            document.getElementById('seguro').value = '';
+            document.getElementById('derechos').value = '';
+            document.getElementById('estadistica').value = '';
+            document.getElementById('iva').value = '';
+            document.getElementById('iva-adicional').value = '';
+            document.getElementById('ganancia').value = '';
+            document.getElementById('iibb').value = '';
+        }
+        
+        function editPosition(id) {
+            const position = posicionesArancelarias.find(p => p.id === id);
+            if (!position) return;
+            
+            document.getElementById('crud-form').style.display = 'block';
+            document.getElementById('form-title').textContent = 'Editar Posición Arancelaria';
+            document.getElementById('posicion-id').value = position.id;
+            document.getElementById('posicion').value = position.posicion;
+            document.getElementById('flete').value = position.flete;
+            document.getElementById('seguro').value = position.seguro;
+            document.getElementById('derechos').value = position.derechos;
+            document.getElementById('estadistica').value = position.estadistica;
+            document.getElementById('iva').value = position.iva;
+            document.getElementById('iva-adicional').value = position.ivaAdicional;
+            document.getElementById('ganancia').value = position.ganancia;
+            document.getElementById('iibb').value = position.iibb;
+        }
+        
+        function cancelForm() {
+            document.getElementById('crud-form').style.display = 'none';
+        }
+        
+        async function savePosition() {
+            const id = document.getElementById('posicion-id').value;
+            const posicion = document.getElementById('posicion').value;
+            const flete = parseFloat(document.getElementById('flete').value);
+            const seguro = parseFloat(document.getElementById('seguro').value);
+            const derechos = parseFloat(document.getElementById('derechos').value);
+            const estadistica = parseFloat(document.getElementById('estadistica').value);
+            const iva = parseFloat(document.getElementById('iva').value);
+            const ivaAdicional = parseFloat(document.getElementById('iva-adicional').value);
+            const ganancia = parseFloat(document.getElementById('ganancia').value);
+            const iibb = parseFloat(document.getElementById('iibb').value);
+            
+            if (!posicion || isNaN(flete) || isNaN(seguro) || isNaN(derechos) || 
+                isNaN(estadistica) || isNaN(iva) || isNaN(ivaAdicional) || 
+                isNaN(ganancia) || isNaN(iibb)) {
+                alert('Por favor, complete todos los campos correctamente.');
+                return;
+            }
+            
+            if (id) {
+                // Actualizar posición existente
+                const index = posicionesArancelarias.findIndex(p => p.id == id);
+                if (index !== -1) {
+                    posicionesArancelarias[index] = {
+                        id: parseInt(id),
+                        posicion,
+                        flete,
+                        seguro,
+                        derechos,
+                        estadistica,
+                        iva,
+                        ivaAdicional,
+                        ganancia,
+                        iibb
+                    };
+                }
+            } else {
+                // Crear nueva posición
+                const newId = posicionesArancelarias.length > 0 ? 
+                    Math.max(...posicionesArancelarias.map(p => p.id)) + 1 : 1;
+                
+                posicionesArancelarias.push({
+                    id: newId,
+                    posicion,
+                    flete,
+                    seguro,
+                    derechos,
+                    estadistica,
+                    iva,
+                    ivaAdicional,
+                    ganancia,
+                    iibb
+                });
+            }
+            
+            await guardarPosicionesArancelarias();
+            renderPosicionesTable();
+            cancelForm();
+            alert('Posición arancelaria guardada correctamente.');
+        }
+        
+        async function deletePosition(id) {
+            if (confirm('¿Está seguro de que desea eliminar esta posición arancelaria?')) {
+                posicionesArancelarias = posicionesArancelarias.filter(p => p.id !== id);
+                await guardarPosicionesArancelarias();
+                renderPosicionesTable();
+                alert('Posición arancelaria eliminada correctamente.');
+            }
+        }
+
+        // Funciones para guardar las distintas secciones de datos generales
+        function guardarSeccionMiami() {
+            datosGenerales.miami.costoKilo = parseFloat(document.getElementById('miami-costo-kilo').value) || 0;
+            datosGenerales.miami.cambioPA = parseFloat(document.getElementById('miami-cambio-pa').value) || 0;
+            datosGenerales.miami.costoKGCourier = parseFloat(document.getElementById('miami-costo-kg-courier').value) || 0;
+            datosGenerales.miami.costoKGCargaGeneral = parseFloat(document.getElementById('miami-costo-kg-carga').value) || 0;
+            datosGenerales.miami.almacenaje = parseFloat(document.getElementById('miami-almacenaje').value) || 0;
+            datosGenerales.miami.gastosOperativos = parseFloat(document.getElementById('miami-gastos-operativos').value) || 0;
+            datosGenerales.miami.gastosOrigen = parseFloat(document.getElementById('miami-gastos-origen').value) || 0;
+            
+            localStorage.setItem('datosGenerales', JSON.stringify(datosGenerales));
+            mostrarMensaje('Datos de Miami guardados correctamente');
+        }
+        
+        function guardarSeccionHongKong() {
+            datosGenerales.hongkong.costoKilo = parseFloat(document.getElementById('hongkong-costo-kilo').value) || 0;
+            datosGenerales.hongkong.cambioPA = parseFloat(document.getElementById('hongkong-cambio-pa').value) || 0;
+            datosGenerales.hongkong.costoKGCourier = parseFloat(document.getElementById('hongkong-costo-kg-courier').value) || 0;
+            datosGenerales.hongkong.costoKGCargaGeneral = parseFloat(document.getElementById('hongkong-costo-kg-carga').value) || 0;
+            datosGenerales.hongkong.almacenaje = parseFloat(document.getElementById('hongkong-almacenaje').value) || 0;
+            datosGenerales.hongkong.gastosOperativos = parseFloat(document.getElementById('hongkong-gastos-operativos').value) || 0;
+            datosGenerales.hongkong.gastosOrigen = parseFloat(document.getElementById('hongkong-gastos-origen').value) || 0;
+            
+            localStorage.setItem('datosGenerales', JSON.stringify(datosGenerales));
+            mostrarMensaje('Datos de Hong Kong guardados correctamente');
+        }
+        
+        function guardarSeccionVarios() {
+            datosGenerales.varios.lcl = parseFloat(document.getElementById('varios-lcl').value) || 0;
+            datosGenerales.varios.resolucion3244 = parseFloat(document.getElementById('varios-resolucion').value) || 0;
+            datosGenerales.varios.seguro = parseFloat(document.getElementById('varios-seguro').value) || 0;
+            datosGenerales.varios.envioDomicilio = parseFloat(document.getElementById('varios-envio-domicilio').value) || 0;
+            datosGenerales.varios.ajusteDolarANA = parseFloat(document.getElementById('varios-ajuste-dolar').value) || 0;
+            datosGenerales.varios.percepcionIIBB = parseFloat(document.getElementById('varios-percepcion-iibb').value) || 0;
+            
+            localStorage.setItem('datosGenerales', JSON.stringify(datosGenerales));
+            mostrarMensaje('Datos de Varios guardados correctamente');
+        }
+
+        // Funciones para el CRUD de pesos
+        function renderPesosTable() {
+            const tableBody = document.getElementById('pesos-body');
+            if (!tableBody) return;
+            
+            tableBody.innerHTML = '';
+            
+            pesos.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.producto}</td>
+                    <td>${item.peso} kg</td>
+                    <td>
+                        <button class="crud-action-btn crud-edit-btn" onclick="editPeso(${item.id})">Editar</button>
+                        <button class="crud-action-btn crud-delete-btn" onclick="deletePeso(${item.id})">Eliminar</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        function showAddPesoForm() {
+            document.getElementById('pesos-crud-form').style.display = 'block';
+            document.getElementById('pesos-form-title').textContent = 'Agregar Producto y Peso';
+            document.getElementById('peso-id').value = '';
+            document.getElementById('producto').value = '';
+            document.getElementById('peso').value = '';
+        }
+        
+        function editPeso(id) {
+            const item = pesos.find(p => p.id === id);
+            if (!item) return;
+            
+            document.getElementById('pesos-crud-form').style.display = 'block';
+            document.getElementById('pesos-form-title').textContent = 'Editar Producto y Peso';
+            document.getElementById('peso-id').value = item.id;
+            document.getElementById('producto').value = item.producto;
+            document.getElementById('peso').value = item.peso;
+        }
+        
+        function cancelPesoForm() {
+            document.getElementById('pesos-crud-form').style.display = 'none';
+        }
+        
+        async function savePeso() {
+            const id = document.getElementById('peso-id').value;
+            const producto = document.getElementById('producto').value;
+            const peso = parseFloat(document.getElementById('peso').value);
+            
+            if (!producto || isNaN(peso) || peso < 0) {
+                alert('Por favor, complete todos los campos correctamente.');
+                return;
+            }
+            
+            if (id) {
+                // Actualizar peso existente
+                const index = pesos.findIndex(p => p.id == id);
+                if (index !== -1) {
+                    pesos[index] = {
+                        id: parseInt(id),
+                        producto,
+                        peso
+                    };
+                }
+            } else {
+                // Crear nuevo peso
+                const newId = pesos.length > 0 ? 
+                    Math.max(...pesos.map(p => p.id)) + 1 : 1;
+                
+                pesos.push({
+                    id: newId,
+                    producto,
+                    peso
+                });
+            }
+            
+            await guardarPesos();
+            renderPesosTable();
+            cancelPesoForm();
+            alert('Producto y peso guardados correctamente.');
+        }
+        
+        async function deletePeso(id) {
+            if (confirm('¿Está seguro de que desea eliminar este producto?')) {
+                pesos = pesos.filter(p => p.id !== id);
+                await guardarPesos();
+                renderPesosTable();
+                alert('Producto eliminado correctamente.');
+            }
+        }
+
+        // Funciones para persistencia de datos del formulario de importación
+        function guardarDatosFormularioImportacion() {
+            const productName = document.getElementById('product-name');
+            const fobPrice = document.getElementById('fob-price');
+            const quantity = document.getElementById('quantity');
+            const unitWeight = document.getElementById('unit-weight');
+            const origin = document.getElementById('origin');
+            const importType = document.getElementById('import-type');
+            const tariffPosition = document.getElementById('tariff-position');
+            
+            if (!productName) return; // No estamos en el formulario de importación
+            
+            const formData = {
+                productName: productName.value,
+                fobPrice: fobPrice.value,
+                quantity: quantity.value,
+                unitWeight: unitWeight.value,
+                origin: origin.value,
+                importType: importType.value,
+                tariffPositionId: tariffPosition.value
+            };
+            
+            localStorage.setItem('importFormData', JSON.stringify(formData));
+        }
+
+        function cargarDatosFormularioImportacion() {
+            const formData = JSON.parse(localStorage.getItem('importFormData') || '{}');
+            
+            if (formData.productName) {
+                document.getElementById('product-name').value = formData.productName;
+                document.getElementById('fob-price').value = formData.fobPrice;
+                document.getElementById('quantity').value = formData.quantity;
+                document.getElementById('unit-weight').value = formData.unitWeight;
+                
+                if (document.getElementById('origin')) {
+                    document.getElementById('origin').value = formData.origin;
+                    document.getElementById('import-type').value = formData.importType;
+                    document.getElementById('tariff-position').value = formData.tariffPositionId;
+                }
+                
+                // Recalcular los totales
+                calcularTotales();
+            }
+        }
+
+        function borrarFormularioImportacion() {
+            document.getElementById('product-name').value = '';
+            document.getElementById('fob-price').value = '';
+            document.getElementById('quantity').value = '1';
+            document.getElementById('unit-weight').value = '';
+            document.getElementById('origin').value = '';
+            document.getElementById('import-type').value = '';
+            document.getElementById('tariff-position').value = '';
+            
+            // Limpiar los totales calculados
+            document.getElementById('fob-total').textContent = '0.00';
+            document.getElementById('weight-total').textContent = '0.00';
+            
+            // Limpiar datos guardados
+            localStorage.removeItem('importFormData');
+        }
+
+        // Ejecutar cuando la página se carga
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Cargar datos guardados
+            await cargarDatosGuardados();
+            
+            // Para desarrollo, puedes descomentar esto para ver la app directamente sin login
+            // document.getElementById('loginSection').style.display = 'none';
+            // document.getElementById('appSection').style.display = 'block';
+            // document.getElementById('welcomeMessage').textContent = '¡Hola, Usuario!';
+            // activateMenuItem(document.querySelector('.sidebar li.active'), 'importacion');
+        });
+
+        // Función para manejar el clic en los encabezados de la tabla
+        function sortPosiciones(sortBy) {
+            // Obtener la dirección actual del ordenamiento
+            const currentDirection = document.querySelector(`.sort-${sortBy}`).getAttribute('data-direction') || 'asc';
+            
+            // Cambiar la dirección para el próximo clic
+            const newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+            
+            // Actualizar el atributo en el elemento
+            document.querySelector(`.sort-${sortBy}`).setAttribute('data-direction', newDirection);
+            
+            // Renderizar la tabla con el nuevo ordenamiento
+            renderPosicionesTable(sortBy, newDirection);
+            
+            // Actualizar los indicadores visuales de ordenamiento
+            updateSortIndicators(sortBy, newDirection);
+        }
+
+        // Función para actualizar los indicadores visuales de ordenamiento
+        function updateSortIndicators(sortBy, direction) {
+            // Eliminar todos los indicadores actuales
+            document.querySelectorAll('.sort-indicator').forEach(el => {
+                el.innerHTML = '';
+            });
+            
+            // Agregar el indicador al encabezado seleccionado
+            const indicator = direction === 'asc' ? '▲' : '▼';
+            document.querySelector(`.sort-${sortBy} .sort-indicator`).innerHTML = indicator;
+        }
+
+        // Modificar la función de inicio de sesión
+        function loginWithGitHub() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                alert('Por favor, ingrese usuario y contraseña.');
+                return;
+            }
+            
+            // Simulación de autenticación (en un entorno real, esto se haría de manera segura en el backend)
+            if (username === 'admin' && password === 'admin') {
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('username', username);
+                
+                // Ocultar el formulario de login
+                document.getElementById('login-form').style.display = 'none';
+                
+                // Mostrar la interfaz principal
+                document.getElementById('main-interface').style.display = 'flex';
+                
+                // Establecer el estado activo en el primer elemento de la barra lateral
+                const firstMenuItem = document.querySelector('.sidebar li');
+                if (firstMenuItem) {
+                    activateMenuItem(firstMenuItem, firstMenuItem.getAttribute('data-section'));
+                }
+                
+                // Cargar los datos almacenados después del inicio de sesión
+                cargarDatosDespuesDeLogin();
+                
+            } else {
+                alert('Usuario o contraseña incorrectos.');
+            }
+        }
+
+        // Agregar nueva función para cargar datos después del login
+        function cargarDatosDespuesDeLogin() {
+            console.log('Cargando datos predefinidos del HTML');
+            
+            // Restaurar datos predefinidos en el HTML para posiciones arancelarias
+            posicionesArancelarias = [
+                {
+                    id: 1,
+                    posicion: '10,5% + 0D + 0E',
+                    flete: 3,
+                    seguro: 2,
+                    derechos: 0,
+                    estadistica: 0,
+                    iva: 10.5,
+                    ivaAdicional: 0,
+                    ganancia: 0,
+                    iibb: 0
+                },
+                {
+                    id: 2,
+                    posicion: '10,5% + 10,8D + 0E',
+                    flete: 3,
+                    seguro: 2,
+                    derechos: 10.8,
+                    estadistica: 0,
+                    iva: 10.5,
+                    ivaAdicional: 0,
+                    ganancia: 0,
+                    iibb: 0
+                },
+                {
+                    id: 3,
+                    posicion: '10,5% + 16D + 0E',
+                    flete: 3,
+                    seguro: 2,
+                    derechos: 16,
+                    estadistica: 0,
+                    iva: 10.5,
+                    ivaAdicional: 0,
+                    ganancia: 0,
+                    iibb: 0
+                },
+                {
+                    id: 4,
+                    posicion: '21% + 0D + 0E',
+                    flete: 3,
+                    seguro: 2,
+                    derechos: 0,
+                    estadistica: 0,
+                    iva: 21,
+                    ivaAdicional: 0,
+                    ganancia: 0,
+                    iibb: 0
+                },
+                {
+                    id: 5,
+                    posicion: '21% + 20D + 3E',
+                    flete: 3,
+                    seguro: 2,
+                    derechos: 20,
+                    estadistica: 0,
+                    iva: 21,
+                    ivaAdicional: 0,
+                    ganancia: 0,
+                    iibb: 0
+                },
+                {
+                    id: 6,
+                    posicion: '21% + 35D + 3E',
+                    flete: 3,
+                    seguro: 2,
+                    derechos: 35,
+                    estadistica: 3,
+                    iva: 21,
+                    ivaAdicional: 0,
+                    ganancia: 0,
+                    iibb: 0
+                },
+                {
+                    id: 7,
+                    posicion: 'Cambio de PA',
+                    flete: 3,
+                    seguro: 2,
+                    derechos: 0,
+                    estadistica: 0,
+                    iva: 10.5,
+                    ivaAdicional: 0,
+                    ganancia: 0,
+                    iibb: 0
+                }
+            ];
+            
+            // Restaurar datos generales predefinidos
+            datosGenerales = {
+                miami: {
+                    costoKilo: 70,
+                    cambioPA: 250,
+                    costoKGCourier: 13.5,
+                    costoKGCargaGeneral: 5,
+                    almacenaje: 0.9,
+                    gastosOperativos: 27,
+                    gastosOrigen: 0
+                },
+                hongkong: {
+                    costoKilo: 15,
+                    cambioPA: 300,
+                    costoKGCourier: 27.5,
+                    costoKGCargaGeneral: 11,
+                    almacenaje: 4.512,
+                    gastosOperativos: 27,
+                    gastosOrigen: 0
+                },
+                varios: {
+                    lcl: 5,
+                    resolucion3244: 10,
+                    seguro: 24.75,
+                    envioDomicilio: 10,
+                    ajusteDolarANA: 1.01,
+                    percepcionIIBB: 0.81
+                }
+            };
+            
+            // Restaurar tipos de cambio predefinidos
+            dolarOficial = 1088;
+            dolarBlue = 1255;
+            
+            // Guardar estos valores en localStorage para uso futuro
+            localStorage.setItem('posicionesArancelarias', JSON.stringify(posicionesArancelarias));
+            localStorage.setItem('datosGenerales', JSON.stringify(datosGenerales));
+            localStorage.setItem('tiposCambio', JSON.stringify({
+                dolarOficial: dolarOficial,
+                dolarBlue: dolarBlue
+            }));
+            
+            console.log('Datos predefinidos cargados correctamente');
+            console.log('Posiciones arancelarias cargadas:', posicionesArancelarias.length);
+            
+            // Actualizar la tabla si estamos en la sección de posiciones arancelarias
+            actualizarTablaPosicionesArancelarias();
+        }
+
+        // Función auxiliar para actualizar la tabla de posiciones arancelarias
+        function actualizarTablaPosicionesArancelarias() {
+            // Si estamos en la sección de posiciones arancelarias, actualizar la tabla
+            const activeSection = document.querySelector('.sidebar li.active');
+            if (activeSection && activeSection.getAttribute('data-section') === 'arancelarias') {
+                console.log('Actualizando tabla de Posiciones Arancelarias...');
+                console.log('Total de posiciones cargadas:', posicionesArancelarias.length);
+                renderPosicionesTable('posicion', 'asc');
+                updateSortIndicators('posicion', 'asc');
+            }
+        }
+
+        // Añadir atributo data-section a los elementos de la barra lateral para facilitar la identificación
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarItems = document.querySelectorAll('.sidebar li');
+            sidebarItems.forEach((item, index) => {
+                let section = '';
+                switch(index) {
+                    case 0: section = 'importacion'; break;
+                    case 1: section = 'dolar'; break;
+                    case 2: section = 'datos_generales'; break;
+                    case 3: section = 'arancelarias'; break;
+                    case 4: section = 'pesos'; break;
+                }
+                item.setAttribute('data-section', section);
+            });
+            
+            // Al cargar la página, si ya hay un usuario logueado, cargar los datos
+            if (document.getElementById('appSection').style.display === 'block') {
+                cargarDatosDespuesDeLogin();
+            }
+        });
+
+        // Función para ordenar en la tabla
+        function updateSortIndicators(sortBy, sortDirection) {
+            const headers = document.querySelectorAll('.crud-table th[class^="sort-"]');
+            headers.forEach(header => {
+                const sortIndicator = header.querySelector('.sort-indicator');
+                if (sortIndicator) {
+                    if (header.classList.contains(`sort-${sortBy}`)) {
+                        sortIndicator.textContent = sortDirection === 'asc' ? '▲' : '▼';
+                    } else {
+                        sortIndicator.textContent = '';
+                    }
+                }
+            });
+        }
+
+        function sortPosiciones(sortBy) {
+            const headers = document.querySelectorAll('.crud-table th[class^="sort-"]');
+            const currentHeader = document.querySelector(`.sort-${sortBy}`);
+            let sortDirection = 'asc';
+            
+            if (currentHeader && currentHeader.querySelector('.sort-indicator').textContent === '▲') {
+                sortDirection = 'desc';
+            }
+            
+            renderPosicionesTable(sortBy, sortDirection);
+            updateSortIndicators(sortBy, sortDirection);
+        }
+
+        // ... existing code ...
+
+        // Función para cargar datos desde GitHub
+        async function fetchDataFromGitHub(fileName) {
+            try {
+                console.log(`Intentando cargar ${fileName} desde GitHub...`);
+                // Simulación de carga desde GitHub - en un entorno real sería una llamada a la API de GitHub
+                // Devolvemos null para simular que no hay datos en GitHub y así usar los valores predeterminados
+                return null;
+            } catch (error) {
+                console.error(`Error al cargar datos desde GitHub: ${error}`);
+                return null;
+            }
+        }
+
+        // ... existing code ...
+
+        // Funciones para guardar datos generales
+        function guardarTodosDatosGenerales() {
+            // Miami
+            datosGenerales.miami.costoKilo = parseFloat(document.getElementById('miami-costo-kilo').value) || 0;
+            datosGenerales.miami.cambioPA = parseFloat(document.getElementById('miami-cambio-pa').value) || 0;
+            datosGenerales.miami.costoKGCourier = parseFloat(document.getElementById('miami-costo-kg-courier').value) || 0;
+            datosGenerales.miami.costoKGCargaGeneral = parseFloat(document.getElementById('miami-costo-kg-carga').value) || 0;
+            datosGenerales.miami.almacenaje = parseFloat(document.getElementById('miami-almacenaje').value) || 0;
+            datosGenerales.miami.gastosOperativos = parseFloat(document.getElementById('miami-gastos-operativos').value) || 0;
+            datosGenerales.miami.gastosOrigen = parseFloat(document.getElementById('miami-gastos-origen').value) || 0;
+            
+            // Hong Kong
+            datosGenerales.hongkong.costoKilo = parseFloat(document.getElementById('hongkong-costo-kilo').value) || 0;
+            datosGenerales.hongkong.cambioPA = parseFloat(document.getElementById('hongkong-cambio-pa').value) || 0;
+            datosGenerales.hongkong.costoKGCourier = parseFloat(document.getElementById('hongkong-costo-kg-courier').value) || 0;
+            datosGenerales.hongkong.costoKGCargaGeneral = parseFloat(document.getElementById('hongkong-costo-kg-carga').value) || 0;
+            datosGenerales.hongkong.almacenaje = parseFloat(document.getElementById('hongkong-almacenaje').value) || 0;
+            datosGenerales.hongkong.gastosOperativos = parseFloat(document.getElementById('hongkong-gastos-operativos').value) || 0;
+            datosGenerales.hongkong.gastosOrigen = parseFloat(document.getElementById('hongkong-gastos-origen').value) || 0;
+            
+            // Varios
+            datosGenerales.varios.lcl = parseFloat(document.getElementById('varios-lcl').value) || 0;
+            datosGenerales.varios.resolucion3244 = parseFloat(document.getElementById('varios-resolucion').value) || 0;
+            datosGenerales.varios.seguro = parseFloat(document.getElementById('varios-seguro').value) || 0;
+            datosGenerales.varios.envioDomicilio = parseFloat(document.getElementById('varios-envio-domicilio').value) || 0;
+            datosGenerales.varios.ajusteDolarANA = parseFloat(document.getElementById('varios-ajuste-dolar').value) || 0;
+            datosGenerales.varios.percepcionIIBB = parseFloat(document.getElementById('varios-percepcion-iibb').value) || 0;
+            
+            // Guardar en localStorage
+            localStorage.setItem('datosGenerales', JSON.stringify(datosGenerales));
+            
+            // Mostrar mensaje de éxito
+            mostrarMensaje('Todos los datos generales se han guardado correctamente');
+        }
+        
+        function guardarSeccionMiami() {
+            // Esta función ya no se usa, pero se mantiene por compatibilidad
+            datosGenerales.miami.costoKilo = parseFloat(document.getElementById('miami-costo-kilo').value) || 0;
+            datosGenerales.miami.cambioPA = parseFloat(document.getElementById('miami-cambio-pa').value) || 0;
+            datosGenerales.miami.costoKGCourier = parseFloat(document.getElementById('miami-costo-kg-courier').value) || 0;
+            datosGenerales.miami.costoKGCargaGeneral = parseFloat(document.getElementById('miami-costo-kg-carga').value) || 0;
+            datosGenerales.miami.almacenaje = parseFloat(document.getElementById('miami-almacenaje').value) || 0;
+            datosGenerales.miami.gastosOperativos = parseFloat(document.getElementById('miami-gastos-operativos').value) || 0;
+            datosGenerales.miami.gastosOrigen = parseFloat(document.getElementById('miami-gastos-origen').value) || 0;
+            
+            localStorage.setItem('datosGenerales', JSON.stringify(datosGenerales));
+            mostrarMensaje('Datos de Miami guardados correctamente');
+        }
+        
+        function guardarSeccionHongKong() {
+            // Esta función ya no se usa, pero se mantiene por compatibilidad
+            datosGenerales.hongkong.costoKilo = parseFloat(document.getElementById('hongkong-costo-kilo').value) || 0;
+            datosGenerales.hongkong.cambioPA = parseFloat(document.getElementById('hongkong-cambio-pa').value) || 0;
+            datosGenerales.hongkong.costoKGCourier = parseFloat(document.getElementById('hongkong-costo-kg-courier').value) || 0;
+            datosGenerales.hongkong.costoKGCargaGeneral = parseFloat(document.getElementById('hongkong-costo-kg-carga').value) || 0;
+            datosGenerales.hongkong.almacenaje = parseFloat(document.getElementById('hongkong-almacenaje').value) || 0;
+            datosGenerales.hongkong.gastosOperativos = parseFloat(document.getElementById('hongkong-gastos-operativos').value) || 0;
+            datosGenerales.hongkong.gastosOrigen = parseFloat(document.getElementById('hongkong-gastos-origen').value) || 0;
+            
+            localStorage.setItem('datosGenerales', JSON.stringify(datosGenerales));
+            mostrarMensaje('Datos de Hong Kong guardados correctamente');
+        }
+        
+        function guardarSeccionVarios() {
+            // Esta función ya no se usa, pero se mantiene por compatibilidad
+            datosGenerales.varios.lcl = parseFloat(document.getElementById('varios-lcl').value) || 0;
+            datosGenerales.varios.resolucion3244 = parseFloat(document.getElementById('varios-resolucion').value) || 0;
+            datosGenerales.varios.seguro = parseFloat(document.getElementById('varios-seguro').value) || 0;
+            datosGenerales.varios.envioDomicilio = parseFloat(document.getElementById('varios-envio-domicilio').value) || 0;
+            datosGenerales.varios.ajusteDolarANA = parseFloat(document.getElementById('varios-ajuste-dolar').value) || 0;
+            datosGenerales.varios.percepcionIIBB = parseFloat(document.getElementById('varios-percepcion-iibb').value) || 0;
+            
+            localStorage.setItem('datosGenerales', JSON.stringify(datosGenerales));
+            mostrarMensaje('Datos de Varios guardados correctamente');
+        }
+        
+        // Funciones para editar valores del dólar
+        function editarDolar(tipo) {
+            const formId = `dolar-${tipo}-form`;
+            const formElement = document.getElementById(formId);
+            formElement.style.display = formElement.style.display === 'block' ? 'none' : 'block';
+        }
+        
+        async function guardarDolar(tipo) {
+            if (tipo === 'oficial') {
+                const nuevoValor = parseFloat(document.getElementById('valor-dolar-oficial').value);
+                if (!isNaN(nuevoValor) && nuevoValor > 0) {
+                    dolarOficial = nuevoValor;
+                    document.querySelector('.dolar-card:first-child .dolar-valor').textContent = `$${dolarOficial}`;
+                    document.getElementById('dolar-oficial-form').style.display = 'none';
+                    await guardarValoresDolar();
+                    alert('Valor del Dolar Oficial guardado correctamente.');
+                } else {
+                    alert('Por favor, ingrese un valor válido para el Dolar Oficial.');
+                }
+            } else if (tipo === 'blue') {
+                const nuevoValor = parseFloat(document.getElementById('valor-dolar-blue').value);
+                if (!isNaN(nuevoValor) && nuevoValor > 0) {
+                    dolarBlue = nuevoValor;
+                    document.querySelector('.dolar-card:nth-child(2) .dolar-valor').textContent = `$${dolarBlue}`;
+                    document.getElementById('dolar-blue-form').style.display = 'none';
+                    await guardarValoresDolar();
+                    alert('Valor del Dolar Blue guardado correctamente.');
+                } else {
+                    alert('Por favor, ingrese un valor válido para el Dolar Blue.');
+                }
+            }
+        }
+
+        function mostrarMensaje(mensaje, tipo = 'success') {
+            // Crear el elemento de mensaje
+            const mensajeElement = document.createElement('div');
+            mensajeElement.className = `mensaje mensaje-${tipo}`;
+            mensajeElement.textContent = mensaje;
+            
+            // Agregar al DOM
+            document.body.appendChild(mensajeElement);
+            
+            // Mostrar con animación
+            setTimeout(() => {
+                mensajeElement.classList.add('mensaje-visible');
+            }, 10);
+            
+            // Ocultar después de 3 segundos
+            setTimeout(() => {
+                mensajeElement.classList.remove('mensaje-visible');
+                setTimeout(() => {
+                    document.body.removeChild(mensajeElement);
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html> 
