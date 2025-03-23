@@ -3306,10 +3306,10 @@
                         scale: isMobile ? 1.0 : 1.5, // Escala reducida en móviles para evitar problemas de memoria
                         backgroundColor: '#ffffff',
                         logging: false,
-                        y: isMobile ? Math.max(0, rect.top + scrollTop - 50) : Math.max(0, rect.top + scrollTop + topOffset + 20), // Capturar más arriba en móviles (50px adicionales)
-                        x: isMobile ? Math.max(0, rect.left + scrollLeft - 20) : Math.max(0, rect.left + scrollLeft), // Capturar más ancho en móviles
-                        width: isMobile ? rect.width + 40 : Math.max(rect.width * 0.8, 280), // Ancho ampliado en móviles (+40px)
-                        height: isMobile ? captureHeight : Math.max(captureHeight - 50, 300), // Sin recorte inferior en móviles
+                        y: isMobile ? Math.max(0, rect.top + scrollTop - 100) : Math.max(0, rect.top + scrollTop + topOffset + 20), // Capturar mucho más arriba en móviles
+                        x: isMobile ? Math.max(0, rect.left + scrollLeft - 30) : Math.max(0, rect.left + scrollLeft), // Capturar más ancho en móviles
+                        width: isMobile ? rect.width + 150 : Math.max(rect.width * 0.8, 280), // Ancho significativamente ampliado en móviles
+                        height: isMobile ? captureHeight + 50 : Math.max(captureHeight - 50, 300), // Mayor altura en móviles
                         windowWidth: document.documentElement.offsetWidth,
                         windowHeight: document.documentElement.offsetHeight
                     }).then(function(canvas) {
