@@ -831,7 +831,6 @@
                     <li onclick="activateMenuItem(this, 'dolar')">Dolar</li>
                     <li onclick="activateMenuItem(this, 'datos_generales')">Datos generales</li>
                     <li onclick="activateMenuItem(this, 'arancelarias')">Posiciones Arancelarias</li>
-                    <li onclick="activateMenuItem(this, 'pesos')">Pesos</li>
                 </ul>
                 <div class="sidebar-footer">
                     BDC simulador COMEX
@@ -1934,18 +1933,16 @@
             contentArea.innerHTML = `
                 <h1 class="page-title">Cálculo de Importación</h1>
                 <div class="import-form compact-result">
-                    <h3 style="font-size: 1.3em; margin-bottom: 15px;">${productName} - ${selectedPosition.posicion} - ${origenText} - ${importTypeText}</h3>
-                    
-                    <div style="font-size: 1.2em; margin: 5px 0 10px 0;">
-                        <strong>Tipo de cambio: $ ${formatearNumero(dolarOficial)} - ${getFormattedDate()}</strong>
-                    </div>
-                    
-                    <div style="font-size: 1.2em; margin: 5px 0 10px 0;">
-                        FOB Unitario: $ ${formatearNumero(fobPrice)} - 
-                        FOB Total: $ ${formatearNumero(totalFOB)} - 
-                        Peso unitario: ${unitWeight.toFixed(2)} kg - 
-                        Peso total: ${totalWeight.toFixed(2)} kg - 
-                        Cantidad: ${quantity}
+                    <div style="font-size: 1.3em; margin-bottom: 15px;">
+                        <div><strong>${productName} - ${selectedPosition.posicion} - ${origenText} - ${importTypeText}</strong></div>
+                        <div style="margin-top: 5px;"><strong>Tipo de cambio: $ ${formatearNumero(dolarOficial)} - ${getFormattedDate()}</strong></div>
+                        <div style="margin-top: 5px;">
+                            FOB Unitario: $ ${formatearNumero(fobPrice)} - 
+                            FOB Total: $ ${formatearNumero(totalFOB)} - 
+                            Peso unitario: ${unitWeight.toFixed(2)} kg - 
+                            Peso total: ${totalWeight.toFixed(2)} kg - 
+                            Cantidad: ${quantity}
+                        </div>
                     </div>
                     
                     <div style="border-bottom: 1px solid #ccc; margin: 5px 0;"></div>
@@ -2032,6 +2029,10 @@
                     </div>
                     
                     <div class="result-table">
+                        <div class="result-row">
+                            <div class="result-label">Costo de la importación:</div>
+                            <div class="result-value">$ ${formatearNumero((total - cambioPA) * dolarOficial)}</div>
+                        </div>
                         <div class="result-row result-total">
                             <div class="result-label">Costo total de Importación (Cambio de PA: $ ${formatearNumero(cambioPA * dolarBlue)}):</div>
                             <div class="result-value">$ ${formatearNumero(total * dolarOficial)}</div>
@@ -3018,7 +3019,6 @@
                     case 1: section = 'dolar'; break;
                     case 2: section = 'datos_generales'; break;
                     case 3: section = 'arancelarias'; break;
-                    case 4: section = 'pesos'; break;
                 }
                 item.setAttribute('data-section', section);
             });
