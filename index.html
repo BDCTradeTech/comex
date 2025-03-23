@@ -1237,7 +1237,7 @@
                         <h1 class="page-title">Datos Generales</h1>
                         
                         <div class="config-row" style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
-                            <div class="config-section" style="flex: 1; min-width: 200px; margin-bottom: 20px; max-width: 23%;">
+                            <div class="config-section" style="flex: 1; min-width: 230px; margin-bottom: 20px; max-width: 24%;">
                                 <h3 style="border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-bottom: 15px;">Miami</h3>
                                 <div class="config-field">
                                     <label for="miami-costo-kilo">Costo por Kilo (USD):</label>
@@ -1269,7 +1269,7 @@
                                 </div>
                             </div>
                             
-                            <div class="config-section" style="flex: 1; min-width: 200px; margin-bottom: 20px; max-width: 23%;">
+                            <div class="config-section" style="flex: 1; min-width: 230px; margin-bottom: 20px; max-width: 24%;">
                                 <h3 style="border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-bottom: 15px;">Hong Kong</h3>
                                 <div class="config-field">
                                     <label for="hongkong-costo-kilo">Costo por Kilo (USD):</label>
@@ -1301,7 +1301,7 @@
                                 </div>
                             </div>
                             
-                            <div class="config-section" style="flex: 1; min-width: 200px; margin-bottom: 20px; max-width: 23%;">
+                            <div class="config-section" style="flex: 1; min-width: 230px; margin-bottom: 20px; max-width: 24%;">
                                 <h3 style="border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-bottom: 15px;">Varios</h3>
                                 <div class="config-field">
                                     <label for="varios-lcl">LCL (USD):</label>
@@ -1329,7 +1329,7 @@
                                 </div>
                             </div>
                             
-                            <div class="config-section" style="flex: 1; min-width: 200px; margin-bottom: 20px; max-width: 23%;">
+                            <div class="config-section" style="flex: 1; min-width: 230px; margin-bottom: 20px; max-width: 24%;">
                                 <h3 style="border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-bottom: 15px;">Ventas</h3>
                                 <div class="config-field">
                                     <label for="ventas-iva">IVA (%):</label>
@@ -1933,15 +1933,15 @@
             contentArea.innerHTML = `
                 <h1 class="page-title">Cálculo de Importación</h1>
                 <div class="import-form compact-result">
-                    <div style="font-size: 1.3em; margin-bottom: 15px; background-color: #f9f9f9; padding: 10px; border-radius: 5px; color: #333;">
-                        <div style="margin-bottom: 7px;"><strong>${productName} - ${selectedPosition.posicion} - ${origenText} - ${importTypeText}</strong></div>
-                        <div style="margin-bottom: 7px;"><strong>Tipo de cambio: $ ${formatearNumero(dolarOficial)} - ${getFormattedDate()}</strong></div>
+                    <div style="font-size: 1.1em; margin-bottom: 15px; background-color: #f9f9f9; padding: 10px; border-radius: 5px; color: #333;">
+                        <div style="margin-bottom: 7px;">${productName} - ${selectedPosition.posicion} - ${origenText} - ${importTypeText}</div>
+                        <div style="margin-bottom: 7px;">Tipo de cambio: $ ${formatearNumero(dolarOficial)} - ${getFormattedDate()}</div>
                         <div>
-                            <strong>FOB Unitario:</strong> $ ${formatearNumero(fobPrice)} - 
-                            <strong>FOB Total:</strong> $ ${formatearNumero(totalFOB)} - 
-                            <strong>Peso unitario:</strong> ${unitWeight.toFixed(2)} kg - 
-                            <strong>Peso total:</strong> ${totalWeight.toFixed(2)} kg - 
-                            <strong>Cantidad:</strong> ${quantity}
+                            FOB Unitario: $ ${formatearNumero(fobPrice)} - 
+                            FOB Total: $ ${formatearNumero(totalFOB)} - 
+                            Peso unitario: ${unitWeight.toFixed(2)} kg - 
+                            Peso total: ${totalWeight.toFixed(2)} kg - 
+                            Cantidad: ${quantity}
                         </div>
                     </div>
                     
@@ -2219,13 +2219,33 @@
         
         function volverAImportacion() {
             // Guardar el precio de venta actual antes de volver
-            const sellPriceElement = document.querySelector('.import-form .result-row:nth-child(2) .result-value');
-            if (sellPriceElement) {
-                const formData = JSON.parse(localStorage.getItem('importFormData') || '{}');
-                const sellPriceText = sellPriceElement.textContent.replace('$', '').trim();
-                formData.sellPrice = sellPriceText.replace(/\./g, '').replace(',', '.');
-                console.log("Guardando precio de venta:", formData.sellPrice);
-                localStorage.setItem('importFormData', JSON.stringify(formData));
+            // Obtener el precio de venta desde la sección de precio de venta final
+            const formData = JSON.parse(localStorage.getItem('importFormData') || '{}');
+            
+            try {
+                // Hay varias maneras de obtener el valor, intentamos todas
+                const sellPriceElement = document.querySelector('.result-row .result-value:contains("Precio de venta final")');
+                const allResultValues = document.querySelectorAll('.result-value');
+                
+                // Buscar el precio de venta en todos los elementos
+                let sellPriceText = "";
+                
+                allResultValues.forEach(el => {
+                    if (el.parentElement && el.parentElement.querySelector('.result-label') && 
+                        el.parentElement.querySelector('.result-label').textContent.includes('Precio de venta final')) {
+                        sellPriceText = el.textContent.replace('$', '').trim();
+                    }
+                });
+                
+                if (sellPriceText) {
+                    formData.sellPrice = sellPriceText.replace(/\./g, '').replace(',', '.');
+                    console.log("Guardando precio de venta:", formData.sellPrice);
+                    localStorage.setItem('importFormData', JSON.stringify(formData));
+                } else {
+                    console.log("No se pudo encontrar el precio de venta en la pantalla de resultados");
+                }
+            } catch (e) {
+                console.error("Error al guardar el precio de venta:", e);
             }
             
             const contentArea = document.getElementById('contentArea');
@@ -2723,7 +2743,7 @@
                 origin: origin.value,
                 importType: importType.value,
                 tariffPositionId: tariffPosition.value,
-                sellPrice: sellPrice ? sellPrice.value : '0'
+                sellPrice: sellPrice && sellPrice.value ? sellPrice.value : ''
             };
             
             localStorage.setItem('importFormData', JSON.stringify(formData));
