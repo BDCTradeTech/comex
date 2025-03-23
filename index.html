@@ -1752,6 +1752,12 @@
             const tariffPositionId = document.getElementById('tariff-position').value;
             const sellPrice = parseFloat(document.getElementById('sell-price').value) || 0;
             
+            // Guardar el precio de venta explícitamente antes de calcular
+            let importFormData = JSON.parse(localStorage.getItem('importFormData') || '{}');
+            importFormData.sellPrice = document.getElementById('sell-price').value;
+            localStorage.setItem('importFormData', JSON.stringify(importFormData));
+            console.log('Precio de venta guardado antes de calcular:', importFormData.sellPrice);
+            
             // Función para obtener la fecha actual formateada
             function getFormattedDate() {
                 const today = new Date();
@@ -2232,74 +2238,46 @@
         }
         
         function volverAImportacion() {
-            // Guardar una referencia del precio de venta actual antes de volver
-            let currentSellPrice = "";
-            
-            // Intentar obtener el precio de venta de los resultados
-            try {
-                const allResultValues = document.querySelectorAll('.result-value');
-                
-                allResultValues.forEach(el => {
-                    if (el.parentElement && el.parentElement.querySelector('.result-label') && 
-                        el.parentElement.querySelector('.result-label').textContent.includes('Precio de venta final')) {
-                        let rawPrice = el.textContent.replace('$', '').trim();
-                        currentSellPrice = rawPrice.replace(/\./g, '').replace(',', '.');
-                    }
-                });
-                
-                console.log("Precio de venta encontrado en resultados:", currentSellPrice);
-            } catch (e) {
-                console.error("Error al leer el precio de venta:", e);
-            }
-            
-            // Restaurar la vista anterior
+            // Recuperar la vista anterior
             const contentArea = document.getElementById('contentArea');
             const prevContent = localStorage.getItem('prevImportView');
             
+            // Recuperar los datos del formulario guardados
+            const importFormData = JSON.parse(localStorage.getItem('importFormData') || '{}');
+            console.log('Datos recuperados al volver:', importFormData);
+            
             if (prevContent) {
+                // Restaurar la vista
                 contentArea.innerHTML = prevContent;
                 
-                // Restaurar los datos del formulario inmediatamente
+                // Esperar a que el DOM se actualice
                 setTimeout(() => {
                     try {
-                        // Cargar los datos guardados del formulario
-                        const formData = JSON.parse(localStorage.getItem('importFormData') || '{}');
-                        
                         // Completar los campos del formulario
                         if (document.getElementById('product-name')) {
-                            document.getElementById('product-name').value = formData.productName || '';
-                            document.getElementById('fob-price').value = formData.fobPrice || '';
-                            document.getElementById('quantity').value = formData.quantity || '1';
-                            document.getElementById('unit-weight').value = formData.unitWeight || '';
-                            document.getElementById('origin').value = formData.origin || '';
-                            document.getElementById('import-type').value = formData.importType || '';
-                            document.getElementById('tariff-position').value = formData.tariffPositionId || '';
+                            document.getElementById('product-name').value = importFormData.productName || '';
+                            document.getElementById('fob-price').value = importFormData.fobPrice || '';
+                            document.getElementById('quantity').value = importFormData.quantity || '1';
+                            document.getElementById('unit-weight').value = importFormData.unitWeight || '';
+                            document.getElementById('origin').value = importFormData.origin || '';
+                            document.getElementById('import-type').value = importFormData.importType || '';
+                            document.getElementById('tariff-position').value = importFormData.tariffPositionId || '';
                             
-                            // Restaurar el precio de venta, con prioridad al recién capturado
-                            const sellPriceInput = document.getElementById('sell-price');
-                            if (sellPriceInput) {
-                                // Usamos el precio capturado de los resultados si existe
-                                if (currentSellPrice) {
-                                    sellPriceInput.value = currentSellPrice;
-                                    // Actualizamos el valor en formData para futuros usos
-                                    formData.sellPrice = currentSellPrice;
-                                    localStorage.setItem('importFormData', JSON.stringify(formData));
-                                }
-                                // Si no, usamos el valor guardado anteriormente
-                                else if (formData.sellPrice) {
-                                    sellPriceInput.value = formData.sellPrice;
-                                }
+                            // IMPORTANTE: Restaurar el precio de venta
+                            if (document.getElementById('sell-price')) {
+                                console.log('Restaurando precio de venta:', importFormData.sellPrice);
+                                document.getElementById('sell-price').value = importFormData.sellPrice || '';
                             }
                             
                             // Recalcular totales
                             calcularTotales();
                         }
                     } catch (error) {
-                        console.error("Error al restaurar datos:", error);
+                        console.error('Error al restaurar datos:', error);
                     }
                 }, 100);
             } else {
-                // Si no hay contenido previo, ir a la vista de importación
+                // Si no hay contenido previo
                 activateMenuItem(document.querySelector('.sidebar li.active'), 'importacion');
             }
         }
@@ -3301,10 +3279,10 @@
                     let captureHeight;
                     if (isMobile) {
                         // En móviles capturamos al menos el 90% del contenido total disponible
-                        captureHeight = Math.min(rect.height * 0.9, 1200);
+                        captureHeight = Math.min(rect.height * 0.95, 1200);
                     } else {
-                        // En escritorio aumentamos la altura de captura para incluir la leyenda BDC
-                        captureHeight = Math.min(visibleHeight * 1.1, rect.height * 0.9);
+                        // Aumentar la altura de captura para asegurar que se vea la leyenda BDC
+                        captureHeight = Math.min(visibleHeight * 1.5, rect.height * 0.95);
                     }
                     
                     // Capturamos el contenido visible, ajustando para tomar más de la izquierda y menos de la derecha
@@ -3312,10 +3290,10 @@
                         scale: isMobile ? 1.0 : 1.5, // Escala reducida en móviles para evitar problemas de memoria
                         backgroundColor: '#ffffff',
                         logging: false,
-                        y: rect.top + scrollTop + topOffset,
-                        x: Math.max(0, rect.left + scrollLeft - 30), // Capturar más área de la izquierda
-                        width: rect.width - 20, // Reducir el ancho capturado por la derecha
-                        height: captureHeight,
+                        y: Math.max(0, rect.top + scrollTop + topOffset - 50), // Reducir offset superior para capturar más contenido
+                        x: Math.max(0, rect.left + scrollLeft - 40), // Aumentar el espacio de la izquierda
+                        width: rect.width - 40, // Reducir significativamente el ancho por la derecha
+                        height: captureHeight + 100, // Aumentar la altura para capturar más contenido inferior
                         windowWidth: document.documentElement.offsetWidth,
                         windowHeight: document.documentElement.offsetHeight
                     }).then(function(canvas) {
