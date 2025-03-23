@@ -1500,9 +1500,7 @@
                                     <div class="form-group">
                                         <label for="sell-price">Precio de Venta (pesos ARG):</label>
                                         <input type="number" id="sell-price" step="0.01" min="0" required value="${savedSellPrice}"
-                                               oninput="guardarDatosFormularioImportacion()" 
-                                               onfocus="guardarDatosFormularioImportacion()" 
-                                               onblur="guardarDatosFormularioImportacion()">
+                                               oninput="calcularTotales(); guardarDatosFormularioImportacion()">
                                     </div>
                                 </div>
                             </div>
@@ -1739,6 +1737,9 @@
             
             document.getElementById('fob-total').textContent = fobTotal.toFixed(2);
             document.getElementById('weight-total').textContent = weightTotal.toFixed(2);
+            
+            // Guardar datos automáticamente cada vez que se calculan los totales
+            guardarDatosFormularioImportacion();
         }
         
         // Función para formatear números con punto como separador de miles y coma como separador decimal
@@ -1757,16 +1758,8 @@
             const tariffPositionId = document.getElementById('tariff-position').value;
             const sellPrice = parseFloat(document.getElementById('sell-price').value) || 0;
             
-            // Guardar el precio de venta explícitamente antes de calcular - CRUCIAL para que no se pierda
-            try {
-                console.log("Guardando precio de venta previo al cálculo:", document.getElementById('sell-price').value);
-                const actualSellPrice = document.getElementById('sell-price').value;
-                let importFormData = JSON.parse(localStorage.getItem('importFormData') || '{}');
-                importFormData.sellPrice = actualSellPrice;
-                localStorage.setItem('importFormData', JSON.stringify(importFormData));
-            } catch (e) {
-                console.error("Error al guardar el precio de venta:", e);
-            }
+            // Simplemente guardar los datos del formulario usando la función existente
+            guardarDatosFormularioImportacion();
             
             // Función para obtener la fecha actual formateada
             function getFormattedDate() {
@@ -2252,53 +2245,13 @@
             const contentArea = document.getElementById('contentArea');
             const prevContent = localStorage.getItem('prevImportView');
             
-            // Recuperar los datos del formulario guardados
-            const importFormData = JSON.parse(localStorage.getItem('importFormData') || '{}');
-            console.log('Datos recuperados al volver:', importFormData);
-            console.log('Precio de venta guardado:', importFormData.sellPrice);
-            
             if (prevContent) {
-                // Restaurar la vista
                 contentArea.innerHTML = prevContent;
                 
-                // Esperar a que el DOM se actualice
-                setTimeout(() => {
-                    try {
-                        // Completar los campos del formulario
-                        if (document.getElementById('product-name')) {
-                            document.getElementById('product-name').value = importFormData.productName || '';
-                            document.getElementById('fob-price').value = importFormData.fobPrice || '';
-                            document.getElementById('quantity').value = importFormData.quantity || '1';
-                            document.getElementById('unit-weight').value = importFormData.unitWeight || '';
-                            document.getElementById('origin').value = importFormData.origin || '';
-                            document.getElementById('import-type').value = importFormData.importType || '';
-                            document.getElementById('tariff-position').value = importFormData.tariffPositionId || '';
-                            
-                            // IMPORTANTE: Restaurar el precio de venta con fuerza
-                            const sellPriceInput = document.getElementById('sell-price');
-                            if (sellPriceInput) {
-                                console.log('Restaurando precio de venta FINAL:', importFormData.sellPrice);
-                                sellPriceInput.value = importFormData.sellPrice || '';
-                                
-                                // Forzar evento de cambio para activar cualquier lógica relacionada
-                                const event = new Event('input', { bubbles: true });
-                                sellPriceInput.dispatchEvent(event);
-                            } else {
-                                console.error('No se encontró el elemento sell-price en el DOM');
-                            }
-                            
-                            // Recalcular totales
-                            calcularTotales();
-                            
-                            // Guardar explícitamente los datos de nuevo
-                            setTimeout(guardarDatosFormularioImportacion, 100);
-                        }
-                    } catch (error) {
-                        console.error('Error al restaurar datos:', error);
-                    }
-                }, 100);
+                // Restaurar los datos del formulario con un pequeño retraso para esperar que el DOM se actualice
+                setTimeout(cargarDatosFormularioImportacion, 100);
             } else {
-                // Si no hay contenido previo
+                // Si no hay contenido previo, ir a la vista de importación
                 activateMenuItem(document.querySelector('.sidebar li.active'), 'importacion');
             }
         }
@@ -3306,15 +3259,15 @@
                         captureHeight = Math.min(visibleHeight * 1.5, rect.height * 0.95);
                     }
                     
-                    // Capturamos el contenido visible, ajustando para tomar más de la izquierda y menos de la derecha
+                    // Capturamos el contenido visible, ajustando para tomar menos en todos los lados
                     html2canvas(contentArea, {
                         scale: isMobile ? 1.0 : 1.5, // Escala reducida en móviles para evitar problemas de memoria
                         backgroundColor: '#ffffff',
                         logging: false,
-                        y: Math.max(0, rect.top + scrollTop + topOffset - 50), // Reducir offset superior para capturar más contenido
-                        x: Math.max(0, rect.left + scrollLeft - 40), // Aumentar el espacio de la izquierda
-                        width: Math.max(rect.width * 0.8, 300), // Recortar aproximadamente 20% del ancho total por la derecha
-                        height: captureHeight + 100, // Aumentar la altura para capturar más contenido inferior
+                        y: Math.max(0, rect.top + scrollTop + topOffset + 20), // Recortar más arriba
+                        x: Math.max(0, rect.left + scrollLeft - 30), // Mantener espacio izquierdo
+                        width: Math.max(rect.width * 0.8, 280), // Recortar derecha (20%)
+                        height: Math.max(captureHeight - 50, 300), // Recortar abajo
                         windowWidth: document.documentElement.offsetWidth,
                         windowHeight: document.documentElement.offsetHeight
                     }).then(function(canvas) {
