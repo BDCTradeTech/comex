@@ -3294,8 +3294,8 @@
                     // En móviles capturamos un área más grande para mostrar más contenido
                     let captureHeight;
                     if (isMobile) {
-                        // En móviles capturamos al menos el 90% del contenido total disponible
-                        captureHeight = Math.min(rect.height * 0.95, 1200);
+                        // En móviles capturamos todo el contenido completo
+                        captureHeight = rect.height;
                     } else {
                         // Aumentar la altura de captura para asegurar que se vea la leyenda BDC
                         captureHeight = Math.min(visibleHeight * 1.5, rect.height * 0.95);
@@ -3306,10 +3306,10 @@
                         scale: isMobile ? 1.0 : 1.5, // Escala reducida en móviles para evitar problemas de memoria
                         backgroundColor: '#ffffff',
                         logging: false,
-                        y: Math.max(0, rect.top + scrollTop + topOffset + 20), // Recortar más arriba
-                        x: Math.max(0, rect.left + scrollLeft - 30), // Mantener espacio izquierdo
-                        width: Math.max(rect.width * 0.8, 280), // Recortar derecha (20%)
-                        height: Math.max(captureHeight - 50, 300), // Recortar abajo
+                        y: isMobile ? Math.max(0, rect.top + scrollTop) : Math.max(0, rect.top + scrollTop + topOffset + 20), // Menos recorte superior en móviles
+                        x: Math.max(0, rect.left + scrollLeft), // Sin recorte lateral en móviles
+                        width: isMobile ? rect.width : Math.max(rect.width * 0.8, 280), // Ancho completo en móviles
+                        height: isMobile ? captureHeight : Math.max(captureHeight - 50, 300), // Sin recorte inferior en móviles
                         windowWidth: document.documentElement.offsetWidth,
                         windowHeight: document.documentElement.offsetHeight
                     }).then(function(canvas) {
