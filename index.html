@@ -2232,68 +2232,74 @@
         }
         
         function volverAImportacion() {
-            // Guardar el precio de venta actual antes de volver
-            // Obtener el precio de venta desde la sección de precio de venta final
-            const formData = JSON.parse(localStorage.getItem('importFormData') || '{}');
+            // Guardar una referencia del precio de venta actual antes de volver
+            let currentSellPrice = "";
             
+            // Intentar obtener el precio de venta de los resultados
             try {
-                // Hay varias maneras de obtener el valor, intentamos todas
-                const sellPriceElement = document.querySelector('.result-row .result-value:contains("Precio de venta final")');
                 const allResultValues = document.querySelectorAll('.result-value');
-                
-                // Buscar el precio de venta en todos los elementos
-                let sellPriceText = "";
                 
                 allResultValues.forEach(el => {
                     if (el.parentElement && el.parentElement.querySelector('.result-label') && 
                         el.parentElement.querySelector('.result-label').textContent.includes('Precio de venta final')) {
-                        sellPriceText = el.textContent.replace('$', '').trim();
+                        let rawPrice = el.textContent.replace('$', '').trim();
+                        currentSellPrice = rawPrice.replace(/\./g, '').replace(',', '.');
                     }
                 });
                 
-                if (sellPriceText) {
-                    // Extraemos solo los números del precio de venta (eliminando puntos de miles y cambiando coma por punto)
-                    let cleanedPrice = sellPriceText.replace(/\./g, '').replace(',', '.');
-                    formData.sellPrice = cleanedPrice;
-                    console.log("Guardando precio de venta:", formData.sellPrice);
-                    localStorage.setItem('importFormData', JSON.stringify(formData));
-                } else {
-                    console.log("No se pudo encontrar el precio de venta en la pantalla de resultados");
-                }
+                console.log("Precio de venta encontrado en resultados:", currentSellPrice);
             } catch (e) {
-                console.error("Error al guardar el precio de venta:", e);
+                console.error("Error al leer el precio de venta:", e);
             }
             
+            // Restaurar la vista anterior
             const contentArea = document.getElementById('contentArea');
             const prevContent = localStorage.getItem('prevImportView');
+            
             if (prevContent) {
                 contentArea.innerHTML = prevContent;
                 
+                // Restaurar los datos del formulario inmediatamente
                 setTimeout(() => {
-                    // Restaurar los datos del formulario después de que el DOM se actualice
-                    const formData = JSON.parse(localStorage.getItem('importFormData') || '{}');
-                    if (formData.productName) {
-                        document.getElementById('product-name').value = formData.productName;
-                        document.getElementById('fob-price').value = formData.fobPrice;
-                        document.getElementById('quantity').value = formData.quantity;
-                        document.getElementById('unit-weight').value = formData.unitWeight;
-                        document.getElementById('origin').value = formData.origin;
-                        document.getElementById('import-type').value = formData.importType;
-                        document.getElementById('tariff-position').value = formData.tariffPositionId;
+                    try {
+                        // Cargar los datos guardados del formulario
+                        const formData = JSON.parse(localStorage.getItem('importFormData') || '{}');
                         
-                        // Restaurar precio de venta siempre, incluso si el valor es 0
-                        if (formData.sellPrice !== undefined && document.getElementById('sell-price')) {
-                            console.log("Restaurando precio de venta:", formData.sellPrice);
-                            document.getElementById('sell-price').value = formData.sellPrice;
+                        // Completar los campos del formulario
+                        if (document.getElementById('product-name')) {
+                            document.getElementById('product-name').value = formData.productName || '';
+                            document.getElementById('fob-price').value = formData.fobPrice || '';
+                            document.getElementById('quantity').value = formData.quantity || '1';
+                            document.getElementById('unit-weight').value = formData.unitWeight || '';
+                            document.getElementById('origin').value = formData.origin || '';
+                            document.getElementById('import-type').value = formData.importType || '';
+                            document.getElementById('tariff-position').value = formData.tariffPositionId || '';
+                            
+                            // Restaurar el precio de venta, con prioridad al recién capturado
+                            const sellPriceInput = document.getElementById('sell-price');
+                            if (sellPriceInput) {
+                                // Usamos el precio capturado de los resultados si existe
+                                if (currentSellPrice) {
+                                    sellPriceInput.value = currentSellPrice;
+                                    // Actualizamos el valor en formData para futuros usos
+                                    formData.sellPrice = currentSellPrice;
+                                    localStorage.setItem('importFormData', JSON.stringify(formData));
+                                }
+                                // Si no, usamos el valor guardado anteriormente
+                                else if (formData.sellPrice) {
+                                    sellPriceInput.value = formData.sellPrice;
+                                }
+                            }
+                            
+                            // Recalcular totales
+                            calcularTotales();
                         }
-                        
-                        // Recalcular los totales y guardar el formulario actualizado
-                        calcularTotales();
-                        setTimeout(guardarDatosFormularioImportacion, 100);
+                    } catch (error) {
+                        console.error("Error al restaurar datos:", error);
                     }
                 }, 100);
             } else {
-                // Si por alguna razón no existe el contenido previo, recreamos la vista de importación
+                // Si no hay contenido previo, ir a la vista de importación
                 activateMenuItem(document.querySelector('.sidebar li.active'), 'importacion');
             }
         }
@@ -3297,18 +3303,18 @@
                         // En móviles capturamos al menos el 90% del contenido total disponible
                         captureHeight = Math.min(rect.height * 0.9, 1200);
                     } else {
-                        // En escritorio mantenemos el comportamiento actual pero capturamos menos hacia abajo
-                        captureHeight = Math.min(visibleHeight * 0.85, rect.height * 0.65);
+                        // En escritorio aumentamos la altura de captura para incluir la leyenda BDC
+                        captureHeight = Math.min(visibleHeight * 1.1, rect.height * 0.9);
                     }
                     
-                    // Capturamos el contenido visible, ajustando para tomar más de la izquierda
+                    // Capturamos el contenido visible, ajustando para tomar más de la izquierda y menos de la derecha
                     html2canvas(contentArea, {
                         scale: isMobile ? 1.0 : 1.5, // Escala reducida en móviles para evitar problemas de memoria
                         backgroundColor: '#ffffff',
                         logging: false,
                         y: rect.top + scrollTop + topOffset,
-                        x: Math.max(0, rect.left + scrollLeft - 20), // Capturar más área de la izquierda
-                        width: rect.width + 40, // Aumentar el ancho de captura
+                        x: Math.max(0, rect.left + scrollLeft - 30), // Capturar más área de la izquierda
+                        width: rect.width - 20, // Reducir el ancho capturado por la derecha
                         height: captureHeight,
                         windowWidth: document.documentElement.offsetWidth,
                         windowHeight: document.documentElement.offsetHeight
