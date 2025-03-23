@@ -583,6 +583,159 @@
             margin-left: auto;
             margin-right: auto;
         }
+        
+        /* Estilos responsive para dispositivos móviles */
+        @media screen and (max-width: 768px) {
+            body {
+                overflow: auto;
+            }
+            
+            .app-container {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .content-area {
+                height: auto;
+                padding: 15px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .import-form {
+                padding: 15px;
+            }
+            
+            .crud-container {
+                padding: 15px;
+            }
+            
+            .crud-table {
+                font-size: 12px;
+            }
+            
+            .crud-table th, .crud-table td {
+                padding: 8px 10px;
+            }
+            
+            .config-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .dolar-card {
+                max-width: none;
+            }
+            
+            /* Tabla responsive con scroll horizontal */
+            .table-responsive {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                margin-bottom: 15px;
+                width: 100%;
+            }
+            
+            /* Mejoras para inputs y botones en móvil */
+            input, select, button {
+                font-size: 16px; /* Evita zoom en iPhone */
+                padding: 8px 12px;
+                height: auto;
+            }
+            
+            button {
+                min-height: 44px; /* Altura mínima para área táctil */
+            }
+            
+            .form-group {
+                margin-bottom: 15px;
+            }
+            
+            /* Espacio adicional entre elementos para facilitar toque */
+            .crud-table td {
+                vertical-align: middle;
+                height: 44px;
+            }
+            
+            /* Ocultar columnas menos importantes en móvil */
+            .crud-table .hide-mobile {
+                display: none;
+            }
+        }
+        
+        /* Ajustes para pantallas muy pequeñas (smartphones) */
+        @media screen and (max-width: 480px) {
+            .sidebar {
+                padding-bottom: 10px;
+            }
+            
+            .sidebar li {
+                padding: 8px 15px;
+            }
+            
+            .user-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+                padding: 10px 15px;
+            }
+            
+            .logout-btn {
+                width: 100%;
+            }
+            
+            .crud-action-btn {
+                width: auto;
+                display: block;
+                margin-bottom: 5px;
+            }
+            
+            .buttons-row {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .buttons-row button {
+                width: 100%;
+            }
+        }
+        
+        /* Estilos para menú móvil */
+        .mobile-menu-toggle {
+            display: none;
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+        }
+        
+        @media screen and (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .sidebar.mobile-visible {
+                display: flex;
+            }
+        }
     </style>
 </head>
 <body>
@@ -604,7 +757,10 @@
 
     <div id="appSection">
         <div class="app-container">
-            <div class="sidebar">
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                Menú <span>&#9776;</span>
+            </button>
+            <div class="sidebar" id="sidebar">
                 <div class="user-info">
                     <p id="welcomeMessage"></p>
                     <button class="logout-btn" onclick="logout()">Salir</button>
@@ -2275,23 +2431,54 @@
 
         // Funciones para el CRUD de pesos
         function renderPesosTable() {
-            const tableBody = document.getElementById('pesos-body');
-            if (!tableBody) return;
+            const pesos = JSON.parse(localStorage.getItem('pesos')) || [];
+            let tableHTML = `
+                <table class="crud-table">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Peso (kg)</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
             
-            tableBody.innerHTML = '';
-            
-            pesos.forEach(item => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${item.producto}</td>
-                    <td>${item.peso} kg</td>
-                    <td>
-                        <button class="crud-action-btn crud-edit-btn" onclick="editPeso(${item.id})">Editar</button>
-                        <button class="crud-action-btn crud-delete-btn" onclick="deletePeso(${item.id})">Eliminar</button>
-                    </td>
+            if (pesos.length === 0) {
+                tableHTML += `
+                    <tr>
+                        <td colspan="3" style="text-align: center;">No hay productos registrados</td>
+                    </tr>
                 `;
-                tableBody.appendChild(row);
-            });
+            } else {
+                pesos.forEach(item => {
+                    tableHTML += `
+                        <tr>
+                            <td>${item.producto}</td>
+                            <td>${item.peso} kg</td>
+                            <td>
+                                <button class="crud-action-btn crud-edit-btn" onclick="editPeso(${item.id})">Editar</button>
+                                <button class="crud-action-btn crud-delete-btn" onclick="deletePeso(${item.id})">Eliminar</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+            
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+            
+            const pesosTableContainer = document.getElementById('pesos-table-container');
+            if (pesosTableContainer) {
+                pesosTableContainer.innerHTML = tableHTML;
+                
+                // Verificar si el contenedor tiene la clase responsive
+                if (!pesosTableContainer.classList.contains('table-responsive')) {
+                    pesosTableContainer.className = 'table-responsive';
+                }
+            }
         }
         
         function showAddPesoForm() {
@@ -2910,6 +3097,38 @@
                 mostrarMensaje('Error al cargar la librería para generar la imagen', 'error');
             };
             document.body.appendChild(script);
+        }
+
+        // Variables para el control de la sesión y datos
+        let usuarioActual = null;
+        
+        // Función para mostrar/ocultar menú móvil
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('mobile-visible');
+        }
+        
+        // Función para iniciar sesión
+        function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const user = validUsers.find(u => u.email === email && u.password === password);
+
+            if (user) {
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('appSection').style.display = 'block';
+                document.getElementById('welcomeMessage').textContent = `¡Hola, ${email}!`;
+                document.getElementById('loginError').textContent = '';
+                
+                // Cargar datos después del login
+                cargarDatosDespuesDeLogin();
+                
+                // Activar la opción de importación por defecto
+                const importMenuItem = document.querySelector('.sidebar li.active');
+                activateMenuItem(importMenuItem, 'importacion');
+            } else {
+                document.getElementById('loginError').textContent = 'Usuario o contraseña incorrectos';
+            }
         }
     </script>
 </body>
