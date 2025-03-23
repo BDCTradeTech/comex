@@ -903,6 +903,13 @@
                 envioDomicilio: 10,
                 ajusteDolarANA: 1.01,
                 percepcionIIBB: 0.81
+            },
+            ventas: {
+                iva: 3.5,
+                iibb: 4.25,
+                ml: 15.80,
+                envios: 5.5,
+                giros: 0.95
             }
         };
         let pesos = [
@@ -1253,12 +1260,43 @@
                                     <input type="number" id="varios-percepcion-iibb" step="0.01" min="0" value="${datosGenerales.varios.percepcionIIBB}">
                                 </div>
                             </div>
+                            
+                            <div class="config-section">
+                                <h3>Ventas</h3>
+                                <div class="config-field">
+                                    <label for="ventas-iva">IVA (%):</label>
+                                    <input type="number" id="ventas-iva" step="0.01" min="0" value="${datosGenerales.ventas.iva}" oninput="calcularTotalVentas()">
+                                </div>
+                                <div class="config-field">
+                                    <label for="ventas-iibb">IIBB (%):</label>
+                                    <input type="number" id="ventas-iibb" step="0.01" min="0" value="${datosGenerales.ventas.iibb}" oninput="calcularTotalVentas()">
+                                </div>
+                                <div class="config-field">
+                                    <label for="ventas-ml">ML (%):</label>
+                                    <input type="number" id="ventas-ml" step="0.01" min="0" value="${datosGenerales.ventas.ml}" oninput="calcularTotalVentas()">
+                                </div>
+                                <div class="config-field">
+                                    <label for="ventas-envios">Envíos (%):</label>
+                                    <input type="number" id="ventas-envios" step="0.01" min="0" value="${datosGenerales.ventas.envios}" oninput="calcularTotalVentas()">
+                                </div>
+                                <div class="config-field">
+                                    <label for="ventas-giros">Giros (%):</label>
+                                    <input type="number" id="ventas-giros" step="0.01" min="0" value="${datosGenerales.ventas.giros}" oninput="calcularTotalVentas()">
+                                </div>
+                                <div class="config-field">
+                                    <label for="ventas-total">Total (%):</label>
+                                    <div id="ventas-total" class="calculated-field">0.00</div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="config-actions" style="text-align: center; margin-top: 20px; margin-bottom: 30px;">
                             <button class="edit-dolar-btn" style="width: auto; padding: 8px 20px;" onclick="guardarTodosDatosGenerales()">Guardar Cambios</button>
                         </div>
                     `;
+                    
+                    // Calcular el total inicial de ventas
+                    setTimeout(calcularTotalVentas, 100);
                     break;
                 case 'dolar':
                     contentArea.innerHTML = `
@@ -1296,8 +1334,6 @@
                         <h1 class="page-title">Importación</h1>
                         <div class="import-form">
                             <h3>Simulación de Importación</h3>
-                            
-                            <!-- Primera fila: Nombre del producto y precio unitario -->
                             <div class="form-row">
                                 <div class="form-col">
                                     <div class="form-group">
@@ -1313,7 +1349,6 @@
                                 </div>
                             </div>
                             
-                            <!-- Segunda fila: Cantidad y peso unitario -->
                             <div class="form-row">
                                 <div class="form-col">
                                     <div class="form-group">
@@ -1329,7 +1364,6 @@
                                 </div>
                             </div>
                             
-                            <!-- Tercera fila: Posición arancelaria -->
                             <div class="form-group">
                                 <label for="tariff-position">Posición Arancelaria:</label>
                                 <select id="tariff-position" required>
@@ -1338,7 +1372,6 @@
                                 </select>
                             </div>
                             
-                            <!-- Cuarta fila: Origen y tipo de importación -->
                             <div class="form-row">
                                 <div class="form-col">
                                     <div class="form-group">
@@ -1380,6 +1413,15 @@
                                 </div>
                             </div>
                             
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="import-date">Fecha:</label>
+                                        <input type="text" id="import-date" placeholder="dd/mm/aa" maxlength="8" required>
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <div class="form-row" style="justify-content: space-between;">
                                 <button class="calculate-btn" onclick="calculateImport()">Calcular Importación</button>
                                 <button class="calculate-btn" style="background-color: #e74c3c;" onclick="borrarFormularioImportacion()">Borrar</button>
@@ -1389,6 +1431,13 @@
                         </div>
                     `;
                     contentArea.innerHTML = importHTML;
+                    
+                    // Inicializar el campo de fecha con la fecha actual en formato dd/mm/aa
+                    const today = new Date();
+                    const day = String(today.getDate()).padStart(2, '0');
+                    const month = String(today.getMonth() + 1).padStart(2, '0');
+                    const year = String(today.getFullYear()).slice(-2);
+                    document.getElementById('import-date').value = `${day}/${month}/${year}`;
                     
                     // Cargar datos guardados del formulario
                     cargarDatosFormularioImportacion();
@@ -1646,6 +1695,7 @@
             const origin = document.getElementById('origin').value;
             const importType = document.getElementById('import-type').value;
             const tariffPositionId = document.getElementById('tariff-position').value;
+            const importDate = document.getElementById('import-date') ? document.getElementById('import-date').value : '';
             
             // Validar que todos los campos estén completos
             if (!productName || isNaN(fobPrice) || isNaN(quantity) || isNaN(unitWeight) || !origin || !importType || !tariffPositionId) {
@@ -1832,7 +1882,7 @@
                     <h3>${productName} - ${selectedPosition.posicion} - ${origenText} - ${importTypeText}</h3>
                     
                     <div class="github-info">
-                        <strong>Información:</strong> Tipo de cambio: $ ${dolarOficial}
+                        <strong>Información:</strong> Tipo de cambio: $ ${dolarOficial} - Fecha: ${importDate}
                     </div>
                     
                     <div style="display: flex; flex-wrap: wrap; gap: 20px;">
@@ -2563,6 +2613,7 @@
             const origin = document.getElementById('origin');
             const importType = document.getElementById('import-type');
             const tariffPosition = document.getElementById('tariff-position');
+            const importDate = document.getElementById('import-date');
             
             if (!productName) return; // No estamos en el formulario de importación
             
@@ -2573,7 +2624,8 @@
                 unitWeight: unitWeight.value,
                 origin: origin.value,
                 importType: importType.value,
-                tariffPositionId: tariffPosition.value
+                tariffPositionId: tariffPosition.value,
+                importDate: importDate ? importDate.value : ''
             };
             
             localStorage.setItem('importFormData', JSON.stringify(formData));
@@ -2594,6 +2646,11 @@
                     document.getElementById('tariff-position').value = formData.tariffPositionId;
                 }
                 
+                // Cargar la fecha si existe
+                if (formData.importDate && document.getElementById('import-date')) {
+                    document.getElementById('import-date').value = formData.importDate;
+                }
+                
                 // Recalcular los totales
                 calcularTotales();
             }
@@ -2608,9 +2665,18 @@
             document.getElementById('import-type').value = '';
             document.getElementById('tariff-position').value = '';
             
-            // Limpiar los totales calculados
-            document.getElementById('fob-total').textContent = '0.00';
-            document.getElementById('weight-total').textContent = '0.00';
+            // Reiniciar la fecha al día actual
+            if (document.getElementById('import-date')) {
+                const today = new Date();
+                const day = String(today.getDate()).padStart(2, '0');
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                const year = String(today.getFullYear()).slice(-2);
+                document.getElementById('import-date').value = `${day}/${month}/${year}`;
+            }
+            
+            // Limpiar resultados y totales
+            document.getElementById('result-container').innerHTML = '';
+            calcularTotales();
             
             // Limpiar datos guardados
             localStorage.removeItem('importFormData');
@@ -2812,6 +2878,13 @@
                     envioDomicilio: 10,
                     ajusteDolarANA: 1.01,
                     percepcionIIBB: 0.81
+                },
+                ventas: {
+                    iva: 3.5,
+                    iibb: 4.25,
+                    ml: 15.80,
+                    envios: 5.5,
+                    giros: 0.95
                 }
             };
             
@@ -2939,6 +3012,13 @@
             datosGenerales.varios.envioDomicilio = parseFloat(document.getElementById('varios-envio-domicilio').value) || 0;
             datosGenerales.varios.ajusteDolarANA = parseFloat(document.getElementById('varios-ajuste-dolar').value) || 0;
             datosGenerales.varios.percepcionIIBB = parseFloat(document.getElementById('varios-percepcion-iibb').value) || 0;
+            
+            // Ventas
+            datosGenerales.ventas.iva = parseFloat(document.getElementById('ventas-iva').value) || 0;
+            datosGenerales.ventas.iibb = parseFloat(document.getElementById('ventas-iibb').value) || 0;
+            datosGenerales.ventas.ml = parseFloat(document.getElementById('ventas-ml').value) || 0;
+            datosGenerales.ventas.envios = parseFloat(document.getElementById('ventas-envios').value) || 0;
+            datosGenerales.ventas.giros = parseFloat(document.getElementById('ventas-giros').value) || 0;
             
             // Guardar en localStorage
             localStorage.setItem('datosGenerales', JSON.stringify(datosGenerales));
@@ -3144,6 +3224,21 @@
             } else {
                 document.getElementById('loginError').textContent = 'Usuario o contraseña incorrectos';
             }
+        }
+
+        // Función para calcular el total de ventas
+        function calcularTotalVentas() {
+            if (!document.getElementById('ventas-iva')) return;
+            
+            const iva = parseFloat(document.getElementById('ventas-iva').value) || 0;
+            const iibb = parseFloat(document.getElementById('ventas-iibb').value) || 0;
+            const ml = parseFloat(document.getElementById('ventas-ml').value) || 0;
+            const envios = parseFloat(document.getElementById('ventas-envios').value) || 0;
+            const giros = parseFloat(document.getElementById('ventas-giros').value) || 0;
+            
+            const total = iva + iibb + ml + envios + giros;
+            
+            document.getElementById('ventas-total').textContent = total.toFixed(2);
         }
     </script>
 </body>
