@@ -1171,6 +1171,16 @@
             return await saveToGitHub('datos_generales.json', datosGenerales);
         }
         
+        function guardarPrecioVenta() {
+            const sellPrice = document.getElementById('sell-price');
+            if (sellPrice) {
+                const formData = JSON.parse(localStorage.getItem('importFormData') || '{}');
+                formData.sellPrice = sellPrice.value;
+                console.log("Guardando precio de venta:", formData.sellPrice);
+                localStorage.setItem('importFormData', JSON.stringify(formData));
+            }
+        }
+        
         async function guardarPesos() {
             return await saveToGitHub('pesos.json', pesos);
         }
@@ -1486,9 +1496,9 @@
                                     <div class="form-group">
                                         <label for="sell-price">Precio de Venta (pesos ARG):</label>
                                         <input type="number" id="sell-price" step="0.01" min="0" required 
-                                               oninput="guardarPrecioVenta()" 
-                                               onfocus="guardarPrecioVenta()" 
-                                               onblur="guardarPrecioVenta()">
+                                               oninput="guardarDatosFormularioImportacion()" 
+                                               onfocus="guardarDatosFormularioImportacion()" 
+                                               onblur="guardarDatosFormularioImportacion()">
                                     </div>
                                 </div>
                             </div>
@@ -1934,7 +1944,7 @@
                 <h1 class="page-title">Cálculo de Importación</h1>
                 <div class="import-form compact-result">
                     <div style="font-size: 1.1em; margin-bottom: 15px; background-color: #f9f9f9; padding: 10px; border-radius: 5px; color: #333;">
-                        <div style="margin-bottom: 7px;">${productName} - ${selectedPosition.posicion} - ${origenText} - ${importTypeText}</div>
+                        <div style="margin-bottom: 7px;"><strong>${productName} - ${selectedPosition.posicion} - ${origenText} - ${importTypeText}</strong></div>
                         <div style="margin-bottom: 7px;">Tipo de cambio: $ ${formatearNumero(dolarOficial)} - ${getFormattedDate()}</div>
                         <div>
                             FOB Unitario: $ ${formatearNumero(fobPrice)} - 
@@ -2202,7 +2212,7 @@
             `);
             
             printWindow.document.write('</head><body>');
-            printWindow.document.write('<div class="import-form compact-result">');
+            printWindow.document.write('<div class="import-form compact-result" style="max-width: 90%; margin: 0 auto; padding-left: 5%; padding-right: 2%;">');
             printWindow.document.write(printContent.innerHTML);
             printWindow.document.write('</div></body></html>');
             
@@ -3371,8 +3381,13 @@
             if (sellPrice) {
                 const formData = JSON.parse(localStorage.getItem('importFormData') || '{}');
                 formData.sellPrice = sellPrice.value;
+                console.log("Guardando precio de venta:", formData.sellPrice);
                 localStorage.setItem('importFormData', JSON.stringify(formData));
             }
+        }
+
+        async function guardarPesos() {
+            return await saveToGitHub('pesos.json', pesos);
         }
     </script>
 </body>
