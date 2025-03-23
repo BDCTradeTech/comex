@@ -3059,23 +3059,35 @@
                     const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
                     const rect = contentArea.getBoundingClientRect();
                     
-                    // Ajustamos para capturar menos contenido en la parte superior e inferior
-                    const topOffset = 100; // 100px desde la parte superior visible (antes era 50px)
+                    // Detectamos si es un dispositivo móvil (ancho menor a 768px)
+                    const isMobile = window.innerWidth <= 768;
+                    
+                    // Ajustamos para capturar menos contenido en la parte superior
+                    const topOffset = 100; // 100px desde la parte superior visible
                     const visibleTop = Math.max(0, rect.top) + topOffset;
                     const visibleHeight = Math.min(window.innerHeight - visibleTop, rect.height - Math.max(0, -rect.top) - topOffset);
                     
-                    // Aumentamos la captura para mostrar más contenido en la parte inferior
-                    const captureHeight = Math.min(visibleHeight * 0.9, rect.height * 0.7);
+                    // En móviles capturamos un área más grande para mostrar más contenido
+                    let captureHeight;
+                    if (isMobile) {
+                        // En móviles capturamos al menos el 90% del contenido total disponible
+                        captureHeight = Math.min(rect.height * 0.9, 1200);
+                    } else {
+                        // En escritorio mantenemos el comportamiento actual
+                        captureHeight = Math.min(visibleHeight * 0.9, rect.height * 0.7);
+                    }
                     
                     // Capturamos el contenido visible
                     html2canvas(contentArea, {
-                        scale: 1.5,
+                        scale: isMobile ? 1.0 : 1.5, // Escala reducida en móviles para evitar problemas de memoria
                         backgroundColor: '#ffffff',
                         logging: false,
                         y: rect.top + scrollTop + topOffset,
                         x: rect.left + scrollLeft,
                         width: rect.width,
-                        height: captureHeight
+                        height: captureHeight,
+                        windowWidth: document.documentElement.offsetWidth,
+                        windowHeight: document.documentElement.offsetHeight
                     }).then(function(canvas) {
                         // Convertir a imagen y descargar
                         const image = canvas.toDataURL('image/jpeg', 0.9);
