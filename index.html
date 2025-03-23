@@ -1758,8 +1758,23 @@
             const tariffPositionId = document.getElementById('tariff-position').value;
             const sellPrice = parseFloat(document.getElementById('sell-price').value) || 0;
             
-            // Simplemente guardar los datos del formulario usando la función existente
-            guardarDatosFormularioImportacion();
+            // Guardar explícitamente el precio de venta ANTES de proceder
+            try {
+                let formData = JSON.parse(localStorage.getItem('importFormData') || '{}');
+                formData.sellPrice = document.getElementById('sell-price').value;
+                formData.productName = productName;
+                formData.fobPrice = document.getElementById('fob-price').value;
+                formData.quantity = document.getElementById('quantity').value;
+                formData.unitWeight = document.getElementById('unit-weight').value;
+                formData.origin = origin;
+                formData.importType = importType;
+                formData.tariffPositionId = tariffPositionId;
+                
+                console.log("Guardando datos antes del cálculo:", formData);
+                localStorage.setItem('importFormData', JSON.stringify(formData));
+            } catch (e) {
+                console.error("Error al guardar datos:", e);
+            }
             
             // Función para obtener la fecha actual formateada
             function getFormattedDate() {
@@ -2241,6 +2256,12 @@
         }
         
         function volverAImportacion() {
+            console.log("Ejecutando volverAImportacion()");
+            
+            // Guardar referencia a los datos actuales
+            const formData = JSON.parse(localStorage.getItem('importFormData') || '{}');
+            console.log("Datos guardados antes de volver:", formData);
+            
             // Recuperar la vista anterior
             const contentArea = document.getElementById('contentArea');
             const prevContent = localStorage.getItem('prevImportView');
@@ -2248,8 +2269,22 @@
             if (prevContent) {
                 contentArea.innerHTML = prevContent;
                 
-                // Restaurar los datos del formulario con un pequeño retraso para esperar que el DOM se actualice
-                setTimeout(cargarDatosFormularioImportacion, 100);
+                // Restaurar los datos del formulario con un retraso para permitir que el DOM se actualice
+                setTimeout(() => {
+                    try {
+                        console.log("Intentando restaurar datos en el formulario");
+                        cargarDatosFormularioImportacion();
+                        
+                        // Verificación adicional para asegurar que el precio de venta se ha restaurado
+                        const sellPrice = document.getElementById('sell-price');
+                        if (sellPrice && formData.sellPrice) {
+                            console.log("Verificación de precio de venta:", formData.sellPrice);
+                            sellPrice.value = formData.sellPrice;
+                        }
+                    } catch (error) {
+                        console.error("Error al restaurar datos:", error);
+                    }
+                }, 100);
             } else {
                 // Si no hay contenido previo, ir a la vista de importación
                 activateMenuItem(document.querySelector('.sidebar li.active'), 'importacion');
@@ -2726,27 +2761,33 @@
 
         function cargarDatosFormularioImportacion() {
             const formData = JSON.parse(localStorage.getItem('importFormData') || '{}');
+            console.log('Cargando datos de formulario:', formData);
             
-            if (formData.productName) {
-                document.getElementById('product-name').value = formData.productName;
-                document.getElementById('fob-price').value = formData.fobPrice;
-                document.getElementById('quantity').value = formData.quantity;
-                document.getElementById('unit-weight').value = formData.unitWeight;
-                
-                if (document.getElementById('origin')) {
-                    document.getElementById('origin').value = formData.origin;
-                    document.getElementById('import-type').value = formData.importType;
-                    document.getElementById('tariff-position').value = formData.tariffPositionId;
-                }
-                
-                // Cargar el precio de venta si existe
-                if (formData.sellPrice && document.getElementById('sell-price')) {
-                    document.getElementById('sell-price').value = formData.sellPrice;
-                }
-                
-                // Recalcular los totales
-                calcularTotales();
+            // Completar los campos del formulario (incluso si formData.productName está vacío)
+            document.getElementById('product-name').value = formData.productName || '';
+            document.getElementById('fob-price').value = formData.fobPrice || '';
+            document.getElementById('quantity').value = formData.quantity || '1';
+            document.getElementById('unit-weight').value = formData.unitWeight || '';
+            
+            if (document.getElementById('origin')) {
+                document.getElementById('origin').value = formData.origin || '';
+                document.getElementById('import-type').value = formData.importType || '';
+                document.getElementById('tariff-position').value = formData.tariffPositionId || '';
             }
+            
+            // SIEMPRE cargar el precio de venta, incluso si está vacío
+            const sellPriceInput = document.getElementById('sell-price');
+            if (sellPriceInput) {
+                console.log('Restaurando precio de venta:', formData.sellPrice);
+                sellPriceInput.value = formData.sellPrice || '';
+                
+                // Forzar un evento de input para activar cualquier lógica relacionada
+                const event = new Event('input', { bubbles: true });
+                sellPriceInput.dispatchEvent(event);
+            }
+            
+            // Recalcular los totales
+            calcularTotales();
         }
 
         function borrarFormularioImportacion() {
