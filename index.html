@@ -1236,9 +1236,9 @@
                     contentArea.innerHTML = `
                         <h1 class="page-title">Datos Generales</h1>
                         
-                        <div class="config-row" style="justify-content: center; flex-wrap: wrap;">
-                            <div class="config-section" style="width: 22%; min-width: 250px;">
-                                <h3>Miami</h3>
+                        <div class="config-row" style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+                            <div class="config-section" style="flex: 1; min-width: 250px; margin-bottom: 20px;">
+                                <h3 style="border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-bottom: 15px;">Miami</h3>
                                 <div class="config-field">
                                     <label for="miami-costo-kilo">Costo por Kilo (USD):</label>
                                     <input type="number" id="miami-costo-kilo" step="0.01" min="0" value="${datosGenerales.miami.costoKilo}">
@@ -1269,8 +1269,8 @@
                                 </div>
                             </div>
                             
-                            <div class="config-section" style="width: 22%; min-width: 250px;">
-                                <h3>Hong Kong</h3>
+                            <div class="config-section" style="flex: 1; min-width: 250px; margin-bottom: 20px;">
+                                <h3 style="border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-bottom: 15px;">Hong Kong</h3>
                                 <div class="config-field">
                                     <label for="hongkong-costo-kilo">Costo por Kilo (USD):</label>
                                     <input type="number" id="hongkong-costo-kilo" step="0.01" min="0" value="${datosGenerales.hongkong.costoKilo}">
@@ -1301,8 +1301,8 @@
                                 </div>
                             </div>
                             
-                            <div class="config-section" style="width: 22%; min-width: 250px;">
-                                <h3>Varios</h3>
+                            <div class="config-section" style="flex: 1; min-width: 250px; margin-bottom: 20px;">
+                                <h3 style="border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-bottom: 15px;">Varios</h3>
                                 <div class="config-field">
                                     <label for="varios-lcl">LCL (USD):</label>
                                     <input type="number" id="varios-lcl" step="0.01" min="0" value="${datosGenerales.varios.lcl}">
@@ -1329,8 +1329,8 @@
                                 </div>
                             </div>
                             
-                            <div class="config-section" style="width: 22%; min-width: 250px;">
-                                <h3>Ventas</h3>
+                            <div class="config-section" style="flex: 1; min-width: 250px; margin-bottom: 20px;">
+                                <h3 style="border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-bottom: 15px;">Ventas</h3>
                                 <div class="config-field">
                                     <label for="ventas-iva">IVA (%):</label>
                                     <input type="number" id="ventas-iva" step="0.01" min="0" value="${datosGenerales.ventas.iva}" oninput="calcularTotalVentas()">
@@ -2024,16 +2024,16 @@
                                     <div class="result-label">Percepción IIBB:</div>
                                     <div class="result-value">$ ${formatearNumero(percepcionIIBB * dolarOficial)}</div>
                                 </div>
+                                <div class="result-row result-cif">
+                                    <div class="result-label">Costo de la importación:</div>
+                                    <div class="result-value">$ ${formatearNumero((total - cambioPA) * dolarOficial)}</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                     
                     <div class="result-table">
                         <div class="result-row">
-                            <div class="result-label">Costo de la importación:</div>
-                            <div class="result-value">$ ${formatearNumero((total - cambioPA) * dolarOficial)}</div>
-                        </div>
-                        <div class="result-row result-total">
                             <div class="result-label">Costo total de Importación (Cambio de PA: $ ${formatearNumero(cambioPA * dolarBlue)}):</div>
                             <div class="result-value">$ ${formatearNumero(total * dolarOficial)}</div>
                         </div>
@@ -2216,6 +2216,14 @@
         }
         
         function volverAImportacion() {
+            // Guardar el precio de venta actual antes de volver
+            const sellPriceElement = document.querySelector('input#sell-price');
+            if (sellPriceElement) {
+                const formData = JSON.parse(localStorage.getItem('importFormData') || '{}');
+                formData.sellPrice = sellPriceElement.value;
+                localStorage.setItem('importFormData', JSON.stringify(formData));
+            }
+            
             const contentArea = document.getElementById('contentArea');
             const prevContent = localStorage.getItem('prevImportView');
             if (prevContent) {
