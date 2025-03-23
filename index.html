@@ -842,12 +842,8 @@
         </div>
     </div>
 
+    <script src="users.js"></script>
     <script>
-        const validUsers = [
-            { email: 'diegolas@gmail.com', password: '123' },
-            { email: 'prueba', password: '123' }
-        ];
-        
         // Variables para almacenar datos
         let posicionesArancelarias = [
             {
@@ -1185,10 +1181,11 @@
             return await saveToGitHub('pesos.json', pesos);
         }
         
+        // Función para iniciar sesión
         function login() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const user = validUsers.find(u => u.email === email && u.password === password);
+            const user = verificarCredenciales(email, password);
 
             if (user) {
                 document.getElementById('loginSection').style.display = 'none';
@@ -3344,29 +3341,6 @@
             sidebar.classList.toggle('mobile-visible');
         }
         
-        // Función para iniciar sesión
-        function login() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const user = validUsers.find(u => u.email === email && u.password === password);
-
-            if (user) {
-                document.getElementById('loginSection').style.display = 'none';
-                document.getElementById('appSection').style.display = 'block';
-                document.getElementById('welcomeMessage').textContent = `¡Hola, ${email}!`;
-                document.getElementById('loginError').textContent = '';
-                
-                // Cargar datos después del login
-                cargarDatosDespuesDeLogin();
-                
-                // Activar la opción de importación por defecto
-                const importMenuItem = document.querySelector('.sidebar li.active');
-                activateMenuItem(importMenuItem, 'importacion');
-            } else {
-                document.getElementById('loginError').textContent = 'Usuario o contraseña incorrectos';
-            }
-        }
-
         // Función para calcular el total de ventas
         function calcularTotalVentas() {
             if (!document.getElementById('ventas-iva')) return;
