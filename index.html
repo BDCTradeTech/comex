@@ -1169,7 +1169,7 @@
                         <h1 class="page-title">Datos Generales</h1>
                         
                         <div class="config-row" style="justify-content: center; flex-wrap: wrap;">
-                            <div class="config-section">
+                            <div class="config-section" style="width: 22%; min-width: 250px;">
                                 <h3>Miami</h3>
                                 <div class="config-field">
                                     <label for="miami-costo-kilo">Costo por Kilo (USD):</label>
@@ -1201,7 +1201,7 @@
                                 </div>
                             </div>
                             
-                            <div class="config-section">
+                            <div class="config-section" style="width: 22%; min-width: 250px;">
                                 <h3>Hong Kong</h3>
                                 <div class="config-field">
                                     <label for="hongkong-costo-kilo">Costo por Kilo (USD):</label>
@@ -1233,7 +1233,7 @@
                                 </div>
                             </div>
                             
-                            <div class="config-section">
+                            <div class="config-section" style="width: 22%; min-width: 250px;">
                                 <h3>Varios</h3>
                                 <div class="config-field">
                                     <label for="varios-lcl">LCL (USD):</label>
@@ -1261,7 +1261,7 @@
                                 </div>
                             </div>
                             
-                            <div class="config-section">
+                            <div class="config-section" style="width: 22%; min-width: 250px;">
                                 <h3>Ventas</h3>
                                 <div class="config-field">
                                     <label for="ventas-iva">IVA (%):</label>
@@ -1284,7 +1284,7 @@
                                     <input type="number" id="ventas-giros" step="0.01" min="0" value="${datosGenerales.ventas.giros}" oninput="calcularTotalVentas()">
                                 </div>
                                 <div class="config-field">
-                                    <label for="ventas-total">Total (%):</label>
+                                    <label for="ventas-total">Costo total por venta (%):</label>
                                     <div id="ventas-total" class="calculated-field">0.00</div>
                                 </div>
                             </div>
@@ -1416,8 +1416,8 @@
                             <div class="form-row">
                                 <div class="form-col">
                                     <div class="form-group">
-                                        <label for="import-date">Fecha:</label>
-                                        <input type="text" id="import-date" placeholder="dd/mm/aa" maxlength="8" required>
+                                        <label for="sell-price">Precio de Venta:</label>
+                                        <input type="number" id="sell-price" step="0.01" min="0" value="0" required>
                                     </div>
                                 </div>
                             </div>
@@ -1432,139 +1432,11 @@
                     `;
                     contentArea.innerHTML = importHTML;
                     
-                    // Inicializar el campo de fecha con la fecha actual en formato dd/mm/aa
-                    const today = new Date();
-                    const day = String(today.getDate()).padStart(2, '0');
-                    const month = String(today.getMonth() + 1).padStart(2, '0');
-                    const year = String(today.getFullYear()).slice(-2);
-                    document.getElementById('import-date').value = `${day}/${month}/${year}`;
+                    // Inicializar el precio de venta en 0
+                    document.getElementById('sell-price').value = "0";
                     
                     // Cargar datos guardados del formulario
                     cargarDatosFormularioImportacion();
-                    break;
-                case 'arancelarias':
-                    contentArea.innerHTML = `
-                        <h1 class="page-title">Posiciones Arancelarias</h1>
-                        <div class="posiciones-container">
-                            <div class="crud-header" style="margin-bottom: 15px;">
-                                <h3>Listado de Posiciones Arancelarias</h3>
-                                <button class="crud-add-btn" onclick="showAddForm()">Nueva Posición</button>
-                            </div>
-                            
-                            <div id="crud-form" class="add-form" style="display: none;">
-                                <h3 id="form-title">Agregar Posición Arancelaria</h3>
-                                <input type="hidden" id="posicion-id">
-                                <div class="form-row">
-                                    <div class="form-col">
-                                        <div class="form-group">
-                                            <label for="posicion">Posición:</label>
-                                            <input type="text" id="posicion" required>
-                                        </div>
-                                    </div>
-                                    <div class="form-col">
-                                        <div class="form-group">
-                                            <label for="iva">IVA (%):</label>
-                                            <input type="number" id="iva" step="0.1" min="0" required>
-                                        </div>
-                                    </div>
-                                    <div class="form-col">
-                                        <div class="form-group">
-                                            <label for="derechos">Derechos (%):</label>
-                                            <input type="number" id="derechos" step="0.1" min="0" required>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-row">
-                                    <div class="form-col">
-                                        <div class="form-group">
-                                            <label for="estadistica">Estadistica (%):</label>
-                                            <input type="number" id="estadistica" step="0.1" min="0" required>
-                                        </div>
-                                    </div>
-                                    <div class="form-col">
-                                        <div class="form-group">
-                                            <label for="flete">Flete (%):</label>
-                                            <input type="number" id="flete" step="0.1" min="0" required>
-                                        </div>
-                                    </div>
-                                    <div class="form-col">
-                                        <div class="form-group">
-                                            <label for="seguro">Seguro (%):</label>
-                                            <input type="number" id="seguro" step="0.1" min="0" required>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-row">
-                                    <div class="form-col">
-                                        <div class="form-group">
-                                            <label for="iva-adicional">IVA Adicional (%):</label>
-                                            <input type="number" id="iva-adicional" step="0.1" min="0" required>
-                                        </div>
-                                    </div>
-                                    <div class="form-col">
-                                        <div class="form-group">
-                                            <label for="ganancia">Ganancia (%):</label>
-                                            <input type="number" id="ganancia" step="0.1" min="0" required>
-                                        </div>
-                                    </div>
-                                    <div class="form-col">
-                                        <div class="form-group">
-                                            <label for="iibb">IIBB (%):</label>
-                                            <input type="number" id="iibb" step="0.1" min="0" required>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-row">
-                                    <button onclick="savePosition()" class="calculate-btn" style="width: 120px; margin-right: 10px;">Guardar</button>
-                                    <button onclick="cancelForm()" class="calculate-btn" style="background-color: #e74c3c; width: 120px;">Cancelar</button>
-                                </div>
-                            </div>
-                            
-                            <table class="crud-table">
-                                <thead>
-                                    <tr>
-                                        <th class="posicion-col sort-posicion" onclick="sortPosiciones('posicion')" style="cursor: pointer;">
-                                            Posición <span class="sort-indicator"></span>
-                                        </th>
-                                        <th class="sort-iva" onclick="sortPosiciones('iva')" style="cursor: pointer;">
-                                            IVA <span class="sort-indicator"></span>
-                                        </th>
-                                        <th class="sort-derechos" onclick="sortPosiciones('derechos')" style="cursor: pointer;">
-                                            Derechos <span class="sort-indicator"></span>
-                                        </th>
-                                        <th class="sort-estadistica" onclick="sortPosiciones('estadistica')" style="cursor: pointer;">
-                                            Estadist. <span class="sort-indicator"></span>
-                                        </th>
-                                        <th class="sort-flete" onclick="sortPosiciones('flete')" style="cursor: pointer;">
-                                            Flete <span class="sort-indicator"></span>
-                                        </th>
-                                        <th class="sort-seguro" onclick="sortPosiciones('seguro')" style="cursor: pointer;">
-                                            Seguro <span class="sort-indicator"></span>
-                                        </th>
-                                        <th class="sort-ivaAdicional" onclick="sortPosiciones('ivaAdicional')" style="cursor: pointer;">
-                                            IVA Ad. <span class="sort-indicator"></span>
-                                        </th>
-                                        <th class="sort-ganancia" onclick="sortPosiciones('ganancia')" style="cursor: pointer;">
-                                            Ganancia <span class="sort-indicator"></span>
-                                        </th>
-                                        <th class="sort-iibb" onclick="sortPosiciones('iibb')" style="cursor: pointer;">
-                                            IIBB <span class="sort-indicator"></span>
-                                        </th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="posiciones-body">
-                                    <!-- Aquí se cargarán dinámicamente las posiciones arancelarias -->
-                                </tbody>
-                            </table>
-                        </div>
-                    `;
-                    // Inicializar el ordenamiento por posición ascendente
-                    renderPosicionesTable('posicion', 'asc');
-                    updateSortIndicators('posicion', 'asc');
                     break;
                 case 'pesos':
                     contentArea.innerHTML = `
@@ -1695,7 +1567,7 @@
             const origin = document.getElementById('origin').value;
             const importType = document.getElementById('import-type').value;
             const tariffPositionId = document.getElementById('tariff-position').value;
-            const importDate = document.getElementById('import-date') ? document.getElementById('import-date').value : '';
+            const sellPrice = parseFloat(document.getElementById('sell-price').value) || 0;
             
             // Validar que todos los campos estén completos
             if (!productName || isNaN(fobPrice) || isNaN(quantity) || isNaN(unitWeight) || !origin || !importType || !tariffPositionId) {
@@ -1882,7 +1754,14 @@
                     <h3>${productName} - ${selectedPosition.posicion} - ${origenText} - ${importTypeText}</h3>
                     
                     <div class="github-info">
-                        <strong>Información:</strong> Tipo de cambio: $ ${dolarOficial} - Fecha: ${importDate}
+                        <strong>Información:</strong> Tipo de cambio: $ ${dolarOficial}
+                    </div>
+                    
+                    <div class="github-info">
+                        <strong>Valor FOB unitario:</strong> $ ${formatearNumero(fobPrice)} - 
+                        <strong>Valor FOB total:</strong> $ ${formatearNumero(totalFOB)} - 
+                        <strong>Peso unitario:</strong> ${unitWeight.toFixed(2)} kg - 
+                        <strong>Peso total:</strong> ${totalWeight.toFixed(2)} kg
                     </div>
                     
                     <div style="display: flex; flex-wrap: wrap; gap: 20px;">
@@ -1995,14 +1874,37 @@
                         </div>
                     </div>
                     
-                    <div class="buttons-row no-print">
-                        <button class="calculate-btn" style="width: 120px;" onclick="volverAImportacion()">Volver</button>
-                        <button class="calculate-btn print-btn" style="width: 120px;" onclick="imprimirCalculo()">Imprimir</button>
-                        <button class="calculate-btn" style="width: 120px; background-color: #3498db;" onclick="descargarComoImagen()">Descargar</button>
+                    <div style="border-bottom: 3px solid #333; margin: 20px 0;"></div>
+                    
+                    <div class="result-table">
+                        <div class="result-row">
+                            <div class="result-label">Costo unitario del producto:</div>
+                            <div class="result-value">$ ${formatearNumero((fobPrice * (1 + porcentajeImportacion/100)) * dolarOficial)}</div>
+                        </div>
+                        <div class="result-row">
+                            <div class="result-label">Precio de Venta:</div>
+                            <div class="result-value">$ ${formatearNumero(sellPrice * dolarOficial)}</div>
+                        </div>
+                        <div class="result-row">
+                            <div class="result-label">Ganancia en $:</div>
+                            <div class="result-value">$ ${formatearNumero((sellPrice - (fobPrice * (1 + porcentajeImportacion/100))) * dolarOficial)}</div>
+                        </div>
+                        <div class="result-row">
+                            <div class="result-label">Ganancia en %:</div>
+                            <div class="result-value">${formatearNumero(((sellPrice / (fobPrice * (1 + porcentajeImportacion/100))) - 1) * 100)}%</div>
+                        </div>
                     </div>
                     
-                    <div class="print-footer">
-                        BDC Trade Tech - Datos de referencia, no tomar como valores finales
+                    <div class="form-row" style="justify-content: space-between; margin-top: 20px;">
+                        <div class="buttons-row no-print">
+                            <button class="calculate-btn" style="width: 120px;" onclick="volverAImportacion()">Volver</button>
+                            <button class="calculate-btn print-btn" style="width: 120px;" onclick="imprimirCalculo()">Imprimir</button>
+                            <button class="calculate-btn" style="width: 120px; background-color: #3498db;" onclick="descargarComoImagen()">Descargar</button>
+                        </div>
+                        <div class="buttons-row">
+                            <button class="calculate-btn" style="width: 120px;" onclick="calculateImport()">Calcular Importación</button>
+                            <button class="calculate-btn" style="background-color: #e74c3c;" onclick="borrarFormularioImportacion()">Borrar</button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -2613,7 +2515,7 @@
             const origin = document.getElementById('origin');
             const importType = document.getElementById('import-type');
             const tariffPosition = document.getElementById('tariff-position');
-            const importDate = document.getElementById('import-date');
+            const sellPrice = document.getElementById('sell-price');
             
             if (!productName) return; // No estamos en el formulario de importación
             
@@ -2625,7 +2527,7 @@
                 origin: origin.value,
                 importType: importType.value,
                 tariffPositionId: tariffPosition.value,
-                importDate: importDate ? importDate.value : ''
+                sellPrice: sellPrice ? sellPrice.value : '0'
             };
             
             localStorage.setItem('importFormData', JSON.stringify(formData));
