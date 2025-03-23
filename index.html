@@ -1487,8 +1487,113 @@
                     `;
                     renderPesosTable();
                     break;
-                default:
-                    contentArea.innerHTML = '<h1 class="page-title">Selecciona una opción</h1><p>Elige una opción de la barra lateral para ver su contenido.</p>';
+                case 'arancelarias':
+                    contentArea.innerHTML = `
+                        <h1 class="page-title">Posiciones Arancelarias</h1>
+                        <div class="posiciones-crud-container">
+                            <div class="crud-header">
+                                <h3>Listado de Posiciones Arancelarias</h3>
+                                <button class="crud-add-btn" onclick="showAddForm()">Nueva Posición</button>
+                            </div>
+                            
+                            <div id="crud-form" class="crud-form">
+                                <h3 id="form-title">Agregar Posición Arancelaria</h3>
+                                <input type="hidden" id="posicion-id">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="posicion">Posición:</label>
+                                        <input type="text" id="posicion" required>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-col">
+                                        <div class="form-group">
+                                            <label for="iva">IVA (%):</label>
+                                            <input type="number" id="iva" step="0.01" min="0" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-col">
+                                        <div class="form-group">
+                                            <label for="derechos">Derechos (%):</label>
+                                            <input type="number" id="derechos" step="0.01" min="0" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-col">
+                                        <div class="form-group">
+                                            <label for="estadistica">Estadística (%):</label>
+                                            <input type="number" id="estadistica" step="0.01" min="0" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-col">
+                                        <div class="form-group">
+                                            <label for="flete">Flete (%):</label>
+                                            <input type="number" id="flete" step="0.01" min="0" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-col">
+                                        <div class="form-group">
+                                            <label for="seguro">Seguro (%):</label>
+                                            <input type="number" id="seguro" step="0.01" min="0" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-col">
+                                        <div class="form-group">
+                                            <label for="iva-adicional">IVA Adicional (%):</label>
+                                            <input type="number" id="iva-adicional" step="0.01" min="0" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-col">
+                                        <div class="form-group">
+                                            <label for="ganancia">Ganancia (%):</label>
+                                            <input type="number" id="ganancia" step="0.01" min="0" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-col">
+                                        <div class="form-group">
+                                            <label for="iibb">IIBB (%):</label>
+                                            <input type="number" id="iibb" step="0.01" min="0" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" onclick="cancelForm()">Cancelar</button>
+                                    <button type="button" onclick="savePosition()">Guardar</button>
+                                </div>
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table class="crud-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="sort-posicion" onclick="sortPosiciones('posicion')">Posición <span class="sort-indicator">▲</span></th>
+                                            <th class="sort-iva" onclick="sortPosiciones('iva')">IVA (%) <span class="sort-indicator"></span></th>
+                                            <th class="sort-derechos" onclick="sortPosiciones('derechos')">Derechos (%) <span class="sort-indicator"></span></th>
+                                            <th class="sort-estadistica" onclick="sortPosiciones('estadistica')">Estadística (%) <span class="sort-indicator"></span></th>
+                                            <th class="sort-flete" onclick="sortPosiciones('flete')">Flete (%) <span class="sort-indicator"></span></th>
+                                            <th class="sort-seguro" onclick="sortPosiciones('seguro')">Seguro (%) <span class="sort-indicator"></span></th>
+                                            <th class="sort-ivaAdicional" onclick="sortPosiciones('ivaAdicional')">IVA Adicional (%) <span class="sort-indicator"></span></th>
+                                            <th class="sort-ganancia" onclick="sortPosiciones('ganancia')">Ganancia (%) <span class="sort-indicator"></span></th>
+                                            <th class="sort-iibb" onclick="sortPosiciones('iibb')">IIBB (%) <span class="sort-indicator"></span></th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="posiciones-body">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Renderizar la tabla de posiciones arancelarias
+                    renderPosicionesTable('posicion', 'asc');
+                    updateSortIndicators('posicion', 'asc');
+                    break;
             }
         }
         
@@ -1757,16 +1862,16 @@
             const contentArea = document.getElementById('contentArea');
             const prevContent = contentArea.innerHTML;
             
-            contentArea.innerHTML = `
+                    contentArea.innerHTML = `
                 <h1 class="page-title">Cálculo de Importación</h1>
                 <div class="import-form compact-result">
-                    <h3>${productName} - ${selectedPosition.posicion} - ${origenText} - ${importTypeText}</h3>
+                    <h3 style="font-size: 1.3em; margin-bottom: 15px;">${productName} - ${selectedPosition.posicion} - ${origenText} - ${importTypeText}</h3>
                     
-                    <div style="font-weight: bold; margin: 15px 0 10px 0;">
+                    <div style="font-size: 1.3em; font-weight: bold; margin: 15px 0 10px 0;">
                         <strong>Tipo de cambio:</strong> $ ${dolarOficial} - ${getFormattedDate()}
                     </div>
                     
-                    <div style="font-size: 1.2em; margin: 15px 0 10px 0;">
+                    <div style="font-size: 1.3em; margin: 15px 0 10px 0;">
                         Valor FOB unitario: $ ${formatearNumero(fobPrice)} - 
                         Valor FOB total: $ ${formatearNumero(totalFOB)} - 
                         Peso unitario: ${unitWeight.toFixed(2)} kg - 
@@ -1785,19 +1890,19 @@
                                 <div class="result-row">
                                     <div class="result-label">Seguro:</div>
                                     <div class="result-value">$ ${formatearNumero(seguro * dolarOficial)}</div>
-                                </div>
+                                        </div>
                                 <div class="result-row" style="margin-bottom: 0;">
                                     <div class="result-label">Flete:</div>
                                     <div class="result-value">$ ${formatearNumero(flete * dolarOficial)}</div>
-                                </div>
+                                    </div>
                                 <div class="result-row result-cif">
                                     <div class="result-label">CIF:</div>
                                     <div class="result-value">$ ${formatearNumero(CIFValue * dolarOficial)}</div>
-                                </div>
+                                        </div>
                                 <div class="result-row">
                                     <div class="result-label">Derechos:</div>
                                     <div class="result-value">$ ${formatearNumero(derechos * dolarOficial)}</div>
-                                </div>
+                                    </div>
                                 <div class="result-row">
                                     <div class="result-label">Estadistica:</div>
                                     <div class="result-value">$ ${formatearNumero(estadistica * dolarOficial)}</div>
@@ -1805,13 +1910,13 @@
                                 <div class="result-row">
                                     <div class="result-label">Flete Internacional (${totalWeight.toFixed(2)} kg):</div>
                                     <div class="result-value">$ ${formatearNumero(fleteInternacional * dolarOficial)}</div>
-                                </div>
+                                        </div>
                                 <div class="result-row">
                                     <div class="result-label">Almacenaje (${totalWeight.toFixed(2)} kg):</div>
                                     <div class="result-value">$ ${formatearNumero(almacenaje * dolarOficial)}</div>
-                                </div>
-                            </div>
-                        </div>
+                                    </div>
+                                        </div>
+                                    </div>
                         
                         <div style="flex: 1; min-width: 300px;">
                             <div class="result-table">
@@ -1822,20 +1927,20 @@
                                 <div class="result-row">
                                     <div class="result-label">Gastos Operativos:</div>
                                     <div class="result-value">$ ${formatearNumero(gastosOperativos * dolarOficial)}</div>
-                                </div>
+                                        </div>
                                 <div class="result-row">
                                     <div class="result-label">Envío a Domicilio:</div>
                                     <div class="result-value">$ ${formatearNumero(envioDomicilio * dolarOficial)}</div>
-                                </div>
+                                    </div>
                                 <div style="border-bottom: 1px solid #ccc; margin: 5px 0;"></div>
                                 <div class="result-row">
                                     <div class="result-label">Neto Gravado:</div>
                                     <div class="result-value">$ ${formatearNumero(netoGravado * dolarOficial)}</div>
-                                </div>
+                                        </div>
                                 <div class="result-row">
                                     <div class="result-label">No Gravado:</div>
                                     <div class="result-value">$ ${formatearNumero(noGravado * dolarOficial)}</div>
-                                </div>
+                                    </div>
                                 <div class="result-row">
                                     <div class="result-label">IVA 10,5%:</div>
                                     <div class="result-value">$ ${formatearNumero(iva105 * dolarOficial)}</div>
@@ -1843,22 +1948,22 @@
                                 <div class="result-row">
                                     <div class="result-label">IVA 21%:</div>
                                     <div class="result-value">$ ${formatearNumero(iva21 * dolarOficial)}</div>
-                                </div>
+                                        </div>
                                 <div class="result-row">
                                     <div class="result-label">Percepcion IIBB:</div>
                                     <div class="result-value">$ ${formatearNumero(percepcionIIBB * dolarOficial)}</div>
+                                    </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
                     
                     <div class="result-table">
                         <div class="result-row result-total">
                             <div class="result-label">Gasto total de la Importación:</div>
                             <div class="result-value">$ ${formatearNumero(total * dolarOficial)}</div>
-                        </div>
-                    </div>
-                    
+                                </div>
+                            </div>
+                            
                     <div style="display: flex; flex-wrap: wrap; gap: 20px; margin-top: 15px;">
                         <div style="flex: 1; min-width: 300px;">
                             <div class="result-row">
@@ -1897,7 +2002,7 @@
                             <div class="result-value">$ ${formatearNumero(sellPrice)}</div>
                         </div>
                         <div class="result-row">
-                            <div class="result-label">Costo por Venta:</div>
+                            <div class="result-label">Costo por Venta (${(datosGenerales.ventas.iva + datosGenerales.ventas.iibb + datosGenerales.ventas.ml + datosGenerales.ventas.envios + datosGenerales.ventas.giros).toFixed(2)}%):</div>
                             <div class="result-value">$ ${formatearNumero(sellPrice * (datosGenerales.ventas.iva + datosGenerales.ventas.iibb + datosGenerales.ventas.ml + datosGenerales.ventas.envios + datosGenerales.ventas.giros) / 100)}</div>
                         </div>
                         <div class="result-row">
@@ -2066,6 +2171,11 @@
                     document.getElementById('origin').value = formData.origin;
                     document.getElementById('import-type').value = formData.importType;
                     document.getElementById('tariff-position').value = formData.tariffPositionId;
+                    
+                    // Restaurar precio de venta
+                    if (formData.sellPrice && document.getElementById('sell-price')) {
+                        document.getElementById('sell-price').value = formData.sellPrice;
+                    }
                     
                     // Recalcular los totales
                     calcularTotales();
@@ -2399,14 +2509,14 @@
         function renderPesosTable() {
             const pesos = JSON.parse(localStorage.getItem('pesos')) || [];
             let tableHTML = `
-                <table class="crud-table">
-                    <thead>
-                        <tr>
+                                <table class="crud-table">
+                                    <thead>
+                                        <tr>
                             <th>Producto</th>
                             <th>Peso (kg)</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
                     <tbody>
             `;
             
@@ -2432,8 +2542,8 @@
             }
             
             tableHTML += `
-                    </tbody>
-                </table>
+                                    </tbody>
+                                </table>
             `;
             
             const pesosTableContainer = document.getElementById('pesos-table-container');
@@ -2559,9 +2669,9 @@
                     document.getElementById('tariff-position').value = formData.tariffPositionId;
                 }
                 
-                // Cargar la fecha si existe
-                if (formData.importDate && document.getElementById('import-date')) {
-                    document.getElementById('import-date').value = formData.importDate;
+                // Cargar el precio de venta si existe
+                if (formData.sellPrice && document.getElementById('sell-price')) {
+                    document.getElementById('sell-price').value = formData.sellPrice;
                 }
                 
                 // Recalcular los totales
@@ -2827,8 +2937,8 @@
             if (activeSection && activeSection.getAttribute('data-section') === 'arancelarias') {
                 console.log('Actualizando tabla de Posiciones Arancelarias...');
                 console.log('Total de posiciones cargadas:', posicionesArancelarias.length);
-                renderPosicionesTable('posicion', 'asc');
-                updateSortIndicators('posicion', 'asc');
+                    renderPosicionesTable('posicion', 'asc');
+                    updateSortIndicators('posicion', 'asc');
             }
         }
 
