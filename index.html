@@ -1834,7 +1834,8 @@
                 unitWeight,
                 origin,
                 importType,
-                tariffPositionId
+                tariffPositionId,
+                sellPrice: document.getElementById('sell-price').value  // Añadir explícitamente el precio de venta
             };
             localStorage.setItem('importFormData', JSON.stringify(formData));
             
