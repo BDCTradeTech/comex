@@ -1762,7 +1762,7 @@
                 <div class="import-form compact-result">
                     <h3>${productName} - ${selectedPosition.posicion} - ${origenText} - ${importTypeText}</h3>
                     
-                    <div class="github-info">
+                    <div style="font-weight: bold; margin: 15px 0 10px 0;">
                         <strong>Tipo de cambio:</strong> $ ${dolarOficial} - ${getFormattedDate()}
                     </div>
                     
@@ -1854,7 +1854,7 @@
                     
                     <div class="result-table">
                         <div class="result-row result-total">
-                            <div class="result-label">Total:</div>
+                            <div class="result-label">Gasto total de la Importación:</div>
                             <div class="result-value">$ ${formatearNumero(total * dolarOficial)}</div>
                         </div>
                     </div>
@@ -1897,12 +1897,16 @@
                             <div class="result-value">$ ${formatearNumero(sellPrice)}</div>
                         </div>
                         <div class="result-row">
+                            <div class="result-label">Costo por Venta:</div>
+                            <div class="result-value">$ ${formatearNumero(sellPrice * (datosGenerales.ventas.iva + datosGenerales.ventas.iibb + datosGenerales.ventas.ml + datosGenerales.ventas.envios + datosGenerales.ventas.giros) / 100)}</div>
+                        </div>
+                        <div class="result-row">
                             <div class="result-label">Ganancia en $:</div>
-                            <div class="result-value">$ ${formatearNumero(sellPrice - ((fobPrice * (1 + porcentajeImportacion/100)) * dolarOficial))}</div>
+                            <div class="result-value">$ ${formatearNumero(sellPrice - ((fobPrice * (1 + porcentajeImportacion/100)) * dolarOficial) - (sellPrice * (datosGenerales.ventas.iva + datosGenerales.ventas.iibb + datosGenerales.ventas.ml + datosGenerales.ventas.envios + datosGenerales.ventas.giros) / 100))}</div>
                         </div>
                         <div class="result-row">
                             <div class="result-label">Ganancia en %:</div>
-                            <div class="result-value">${formatearNumero((sellPrice / ((fobPrice * (1 + porcentajeImportacion/100)) * dolarOficial) - 1) * 100)}%</div>
+                            <div class="result-value">${formatearNumero(((sellPrice - ((fobPrice * (1 + porcentajeImportacion/100)) * dolarOficial) - (sellPrice * (datosGenerales.ventas.iva + datosGenerales.ventas.iibb + datosGenerales.ventas.ml + datosGenerales.ventas.envios + datosGenerales.ventas.giros) / 100)) / ((fobPrice * (1 + porcentajeImportacion/100)) * dolarOficial)) * 100)}%</div>
                         </div>
                     </div>
                     
@@ -1911,10 +1915,6 @@
                             <button class="calculate-btn" style="width: 120px;" onclick="volverAImportacion()">Volver</button>
                             <button class="calculate-btn print-btn" style="width: 120px;" onclick="imprimirCalculo()">Imprimir</button>
                             <button class="calculate-btn" style="width: 120px; background-color: #3498db;" onclick="descargarComoImagen()">Descargar</button>
-                        </div>
-                        <div class="buttons-row">
-                            <button class="calculate-btn" style="width: 120px;" onclick="calculateImport()">Calcular Importación</button>
-                            <button class="calculate-btn" style="background-color: #e74c3c;" onclick="borrarFormularioImportacion()">Borrar</button>
                         </div>
                     </div>
                 </div>
