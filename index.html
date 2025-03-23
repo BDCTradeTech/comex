@@ -1296,6 +1296,8 @@
                         <h1 class="page-title">Importación</h1>
                         <div class="import-form">
                             <h3>Simulación de Importación</h3>
+                            
+                            <!-- Primera fila: Nombre del producto y precio unitario -->
                             <div class="form-row">
                                 <div class="form-col">
                                     <div class="form-group">
@@ -1305,12 +1307,13 @@
                                 </div>
                                 <div class="form-col">
                                     <div class="form-group">
-                                        <label for="fob-price">Precio FOB (USD):</label>
+                                        <label for="fob-price">Precio Unitario (USD):</label>
                                         <input type="number" id="fob-price" step="0.01" min="0" required oninput="calcularTotales()">
                                     </div>
                                 </div>
                             </div>
                             
+                            <!-- Segunda fila: Cantidad y peso unitario -->
                             <div class="form-row">
                                 <div class="form-col">
                                     <div class="form-group">
@@ -1326,25 +1329,16 @@
                                 </div>
                             </div>
                             
-                            <div class="divider"></div>
-                            
-                            <div class="form-row">
-                                <div class="form-col">
-                                    <div class="form-group">
-                                        <label for="fob-total">FOB Total (USD):</label>
-                                        <div id="fob-total" class="calculated-field">0.00</div>
-                                    </div>
-                                </div>
-                                <div class="form-col">
-                                    <div class="form-group">
-                                        <label for="weight-total">Peso Total (kg):</label>
-                                        <div id="weight-total" class="calculated-field">0.00</div>
-                                    </div>
-                                </div>
+                            <!-- Tercera fila: Posición arancelaria -->
+                            <div class="form-group">
+                                <label for="tariff-position">Posición Arancelaria:</label>
+                                <select id="tariff-position" required>
+                                    <option value="">Seleccionar posición arancelaria</option>
+                                    ${generarOpcionesPosiciones()}
+                                </select>
                             </div>
                             
-                            <div class="divider"></div>
-                            
+                            <!-- Cuarta fila: Origen y tipo de importación -->
                             <div class="form-row">
                                 <div class="form-col">
                                     <div class="form-group">
@@ -1369,12 +1363,21 @@
                                 </div>
                             </div>
                             
-                            <div class="form-group">
-                                <label for="tariff-position">Posición Arancelaria:</label>
-                                <select id="tariff-position" required>
-                                    <option value="">Seleccionar posición arancelaria</option>
-                                    ${generarOpcionesPosiciones()}
-                                </select>
+                            <div class="divider"></div>
+                            
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="fob-total">FOB Total (USD):</label>
+                                        <div id="fob-total" class="calculated-field">0.00</div>
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="weight-total">Peso Total (kg):</label>
+                                        <div id="weight-total" class="calculated-field">0.00</div>
+                                    </div>
+                                </div>
                             </div>
                             
                             <div class="form-row" style="justify-content: space-between;">
