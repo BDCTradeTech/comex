@@ -2087,6 +2087,10 @@
                         </div>
                     </div>
                     
+                    <div style="text-align: center; margin: 15px 0; padding: 10px; background-color: #f9f9f9; border: 1px solid #e0e0e0; border-radius: 5px; font-style: italic; color: #666;">
+                        <p style="margin: 0; font-size: 14px;">BDC Calculador de Importaciones - Datos de referencia no tomar como valores definitivos</p>
+                    </div>
+                    
                     <div class="form-row" style="justify-content: space-between; margin-top: 15px;">
                         <div class="buttons-row no-print">
                             <button class="calculate-btn" style="width: 120px;" onclick="volverAImportacion()">Volver</button>
@@ -2248,7 +2252,9 @@
                 });
                 
                 if (sellPriceText) {
-                    formData.sellPrice = sellPriceText.replace(/\./g, '').replace(',', '.');
+                    // Extraemos solo los números del precio de venta (eliminando puntos de miles y cambiando coma por punto)
+                    let cleanedPrice = sellPriceText.replace(/\./g, '').replace(',', '.');
+                    formData.sellPrice = cleanedPrice;
                     console.log("Guardando precio de venta:", formData.sellPrice);
                     localStorage.setItem('importFormData', JSON.stringify(formData));
                 } else {
@@ -2275,14 +2281,15 @@
                         document.getElementById('import-type').value = formData.importType;
                         document.getElementById('tariff-position').value = formData.tariffPositionId;
                         
-                        // Restaurar precio de venta
-                        if (formData.sellPrice && document.getElementById('sell-price')) {
+                        // Restaurar precio de venta siempre, incluso si el valor es 0
+                        if (formData.sellPrice !== undefined && document.getElementById('sell-price')) {
                             console.log("Restaurando precio de venta:", formData.sellPrice);
                             document.getElementById('sell-price').value = formData.sellPrice;
                         }
                         
-                        // Recalcular los totales
+                        // Recalcular los totales y guardar el formulario actualizado
                         calcularTotales();
+                        setTimeout(guardarDatosFormularioImportacion, 100);
                     }
                 }, 100);
             } else {
@@ -3290,18 +3297,18 @@
                         // En móviles capturamos al menos el 90% del contenido total disponible
                         captureHeight = Math.min(rect.height * 0.9, 1200);
                     } else {
-                        // En escritorio mantenemos el comportamiento actual
-                        captureHeight = Math.min(visibleHeight * 0.9, rect.height * 0.7);
+                        // En escritorio mantenemos el comportamiento actual pero capturamos menos hacia abajo
+                        captureHeight = Math.min(visibleHeight * 0.85, rect.height * 0.65);
                     }
                     
-                    // Capturamos el contenido visible
+                    // Capturamos el contenido visible, ajustando para tomar más de la izquierda
                     html2canvas(contentArea, {
                         scale: isMobile ? 1.0 : 1.5, // Escala reducida en móviles para evitar problemas de memoria
                         backgroundColor: '#ffffff',
                         logging: false,
                         y: rect.top + scrollTop + topOffset,
-                        x: rect.left + scrollLeft,
-                        width: rect.width,
+                        x: Math.max(0, rect.left + scrollLeft - 20), // Capturar más área de la izquierda
+                        width: rect.width + 40, // Aumentar el ancho de captura
                         height: captureHeight,
                         windowWidth: document.documentElement.offsetWidth,
                         windowHeight: document.documentElement.offsetHeight
@@ -3309,7 +3316,7 @@
                         // Convertir a imagen y descargar
                         const image = canvas.toDataURL('image/jpeg', 0.9);
                         const link = document.createElement('a');
-                        link.download = 'captura-pantalla.jpg';
+                        link.download = 'BDC-Comex.jpg';
                         link.href = image;
                         link.click();
                         
