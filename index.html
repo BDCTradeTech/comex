@@ -1416,7 +1416,7 @@
                             <div class="form-row">
                                 <div class="form-col">
                                     <div class="form-group">
-                                        <label for="sell-price">Precio de Venta:</label>
+                                        <label for="sell-price">Precio de Venta (pesos ARG):</label>
                                         <input type="number" id="sell-price" step="0.01" min="0" value="0" required>
                                     </div>
                                 </div>
@@ -1568,6 +1568,15 @@
             const importType = document.getElementById('import-type').value;
             const tariffPositionId = document.getElementById('tariff-position').value;
             const sellPrice = parseFloat(document.getElementById('sell-price').value) || 0;
+            
+            // Función para obtener la fecha actual formateada
+            function getFormattedDate() {
+                const today = new Date();
+                const day = String(today.getDate()).padStart(2, '0');
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                const year = String(today.getFullYear()).slice(-2);
+                return `${day}/${month}/${year}`;
+            }
             
             // Validar que todos los campos estén completos
             if (!productName || isNaN(fobPrice) || isNaN(quantity) || isNaN(unitWeight) || !origin || !importType || !tariffPositionId) {
@@ -1754,15 +1763,17 @@
                     <h3>${productName} - ${selectedPosition.posicion} - ${origenText} - ${importTypeText}</h3>
                     
                     <div class="github-info">
-                        <strong>Información:</strong> Tipo de cambio: $ ${dolarOficial}
+                        <strong>Tipo de cambio:</strong> $ ${dolarOficial} - ${getFormattedDate()}
                     </div>
                     
-                    <div class="github-info">
-                        <strong>Valor FOB unitario:</strong> $ ${formatearNumero(fobPrice)} - 
-                        <strong>Valor FOB total:</strong> $ ${formatearNumero(totalFOB)} - 
-                        <strong>Peso unitario:</strong> ${unitWeight.toFixed(2)} kg - 
-                        <strong>Peso total:</strong> ${totalWeight.toFixed(2)} kg
+                    <div style="font-size: 1.2em; margin: 15px 0 10px 0;">
+                        Valor FOB unitario: $ ${formatearNumero(fobPrice)} - 
+                        Valor FOB total: $ ${formatearNumero(totalFOB)} - 
+                        Peso unitario: ${unitWeight.toFixed(2)} kg - 
+                        Peso total: ${totalWeight.toFixed(2)} kg
                     </div>
+                    
+                    <div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
                     
                     <div style="display: flex; flex-wrap: wrap; gap: 20px;">
                         <div style="flex: 1; min-width: 300px;">
@@ -1883,15 +1894,15 @@
                         </div>
                         <div class="result-row">
                             <div class="result-label">Precio de Venta:</div>
-                            <div class="result-value">$ ${formatearNumero(sellPrice * dolarOficial)}</div>
+                            <div class="result-value">$ ${formatearNumero(sellPrice)}</div>
                         </div>
                         <div class="result-row">
                             <div class="result-label">Ganancia en $:</div>
-                            <div class="result-value">$ ${formatearNumero((sellPrice - (fobPrice * (1 + porcentajeImportacion/100))) * dolarOficial)}</div>
+                            <div class="result-value">$ ${formatearNumero(sellPrice - ((fobPrice * (1 + porcentajeImportacion/100)) * dolarOficial))}</div>
                         </div>
                         <div class="result-row">
                             <div class="result-label">Ganancia en %:</div>
-                            <div class="result-value">${formatearNumero(((sellPrice / (fobPrice * (1 + porcentajeImportacion/100))) - 1) * 100)}%</div>
+                            <div class="result-value">${formatearNumero((sellPrice / ((fobPrice * (1 + porcentajeImportacion/100)) * dolarOficial) - 1) * 100)}%</div>
                         </div>
                     </div>
                     
